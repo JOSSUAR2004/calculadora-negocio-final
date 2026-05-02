@@ -372,7 +372,7 @@ const App = () => {
 
             {modo === 'deudas' && (
               <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-5 animate-in fade-in duration-500">
-                <h3 className="text-xs font-black uppercase text-red-500 italic">Registrar Saldo</h3>
+                <h3 className="text-xs font-black uppercase text-white-500 italic">Registrar Saldo</h3>
                 <Input label="Cliente" id="d-nom" />
                 <Input label="Valor COP" type="number" id="d-val" />
                 <button
@@ -393,7 +393,7 @@ const App = () => {
                       document.getElementById('d-val').value = '';
                     }
                   }}
-                  className="w-full bg-red-500 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-red-100"
+                  className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-indigo-100"
                 >
                   Crear Cuenta
                 </button>
