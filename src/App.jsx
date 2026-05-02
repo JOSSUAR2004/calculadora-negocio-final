@@ -8,6 +8,9 @@ const App = () => {
   const [historial, setHistorial] = useState(() => JSON.parse(localStorage.getItem('g93_historial')) || []);
   const [stock, setStock] = useState(() => JSON.parse(localStorage.getItem('g93_stock')) || []);
   const [deudas, setDeudas] = useState(() => JSON.parse(localStorage.getItem('g93_deudas')) || []);
+  const [ventas, setVentas] = useState(() => JSON.parse(localStorage.getItem('g93_ventas')) || []);
+  const [editandoId, setEditandoId] = useState(null); // Para saber qué fila se edita
+  const [tempEdit, setTempEdit] = useState({});      // Para guardar los cambios temporales
 
   // --- SINCRONIZACIÓN LOCALSTORAGE ---
   useEffect(() => {
@@ -16,7 +19,29 @@ const App = () => {
     localStorage.setItem('g93_historial', JSON.stringify(historial));
     localStorage.setItem('g93_stock', JSON.stringify(stock));
     localStorage.setItem('g93_deudas', JSON.stringify(deudas));
-  }, [tasaCOP, items, historial, stock, deudas]);
+    localStorage.setItem('g93_ventas', JSON.stringify(ventas));
+  }, [tasaCOP, items, historial, stock, deudas, ventas]);
+
+
+  const iniciarEdicion = (item) => {
+    setEditandoId(item.id);
+    setTempEdit({ ...item });
+  };
+
+  const guardarEdicion = () => {
+    setStock(stock.map(i => i.id === editandoId ? tempEdit : i));
+    setEditandoId(null);
+  };
+
+  const registrarVenta = (item) => {
+    const nuevaVenta = {
+      ...item,
+      fechaVenta: new Date().toLocaleString(),
+      idVenta: Date.now()
+    };
+    setVentas([nuevaVenta, ...ventas]); // Agrega al historial
+    setStock(stock.filter(i => i.id !== item.id)); // Elimina del stock
+  };
 
   // --- CONSTANTES LOGÍSTICAS ---
   const COSTO_LIBRA = 3.10;
@@ -129,10 +154,13 @@ const App = () => {
 
           <nav className="flex bg-slate-100 p-1.5 rounded-2xl w-full lg:w-auto overflow-x-auto border border-slate-200">
             {[
-              { id: 'camisetas', label: 'Jerseys', icon: '👕' },
+              { id: 'ventas', label: 'Sales', icon: '🛒' },
+              { id: 'camisetas', label: 'Camisetas', icon: '👕' },
               { id: 'zapatos', label: 'Guayos', icon: '👟' },
               { id: 'stock', label: 'Inventario', icon: '📦' },
               { id: 'deudas', label: 'Cuentas', icon: '💸' }
+
+
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -204,7 +232,7 @@ const App = () => {
 
             {modo === 'stock' && (
               <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-5 animate-in fade-in duration-500">
-                <h3 className="text-xs font-black uppercase text-orange-500 italic tracking-widest">Nuevo Ingreso a Bodega</h3>
+                <h3 className="text-xs font-black uppercase text-orange-500 italic tracking-widest">Nuevo Ingreso a stock</h3>
                 <Input
                   label="Referencia / Equipo"
                   placeholder="Ej: Real Madrid Local"
@@ -253,6 +281,37 @@ const App = () => {
                   Confirmar Entrada
                 </button>
               </section>
+            )}
+
+            {modo === 'ventas' && (
+              <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in">
+                <div className="p-8 bg-slate-900 text-white">
+                  <p className="text-[10px] font-black uppercase opacity-60">Historial de Salidas</p>
+                  <h2 className="text-4xl font-black">{ventas.length} Unidades Vendidas</h2>
+                </div>
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase">
+                    <tr>
+                      <th className="p-6">Fecha de Venta</th>
+                      <th className="p-6">Producto</th>
+                      <th className="p-6 text-center">Talla</th>
+                      <th className="p-6 text-right">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {ventas.map(v => (
+                      <tr key={v.idVenta}>
+                        <td className="p-6 text-xs text-slate-400">{v.fechaVenta}</td>
+                        <td className="p-6 font-bold uppercase">{v.referencia}</td>
+                        <td className="p-6 text-center font-black">{v.talla}</td>
+                        <td className="p-6 text-right">
+                          <span className="text-emerald-500 font-black text-[10px] uppercase">✓ Entregado</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
 
             {modo === 'deudas' && (
@@ -383,22 +442,36 @@ const App = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       {stock.map(item => (
-                        <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                          <td className="p-6 font-bold text-slate-800 text-sm uppercase">{item.referencia}</td>
-                          <td className="p-6 text-center">
-                            <span className="text-[9px] font-black text-slate-400 uppercase italic bg-slate-100 px-2 py-1 rounded-md">{item.tipo}</span>
-                          </td>
-                          <td className="p-6 text-center">
-                            <span className="text-[10px] font-black text-orange-600">Talla {item.talla}</span>
-                          </td>
-                          <td className="p-6 text-right">
-                            <button
-                              onClick={() => setStock(stock.filter(i => i.id !== item.id))}
-                              className="bg-slate-900 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase hover:bg-emerald-500 transition-colors"
-                            >
-                              Vendido
-                            </button>
-                          </td>
+                        <tr key={item.id} className="hover:bg-slate-50">
+                          {editandoId === item.id ? (
+                            // --- VISTA DE EDICIÓN ---
+                            <>
+                              <td className="p-4">
+                                <input className="border rounded-lg p-2 w-full font-bold"
+                                  value={tempEdit.referencia}
+                                  onChange={e => setTempEdit({ ...tempEdit, referencia: e.target.value })} />
+                              </td>
+                              <td className="p-4 text-center">
+                                <input className="border rounded-lg p-2 w-20 font-bold"
+                                  value={tempEdit.talla}
+                                  onChange={e => setTempEdit({ ...tempEdit, talla: e.target.value })} />
+                              </td>
+                              <td className="p-4 text-right">
+                                <button onClick={guardarEdicion} className="bg-emerald-500 text-white px-4 py-2 rounded-lg font-black text-[10px] uppercase mr-2">Guardar</button>
+                                <button onClick={() => setEditandoId(null)} className="text-slate-400 font-black text-[10px] uppercase">Cancelar</button>
+                              </td>
+                            </>
+                          ) : (
+                            // --- VISTA NORMAL ---
+                            <>
+                              <td className="p-6 font-bold text-slate-800 uppercase">{item.referencia}</td>
+                              <td className="p-6 text-center font-black text-orange-600">Talla {item.talla}</td>
+                              <td className="p-6 text-right space-x-4">
+                                <button onClick={() => iniciarEdicion(item)} className="text-slate-400 hover:text-indigo-600 transition-colors">✏️ Editar</button>
+                                <button onClick={() => registrarVenta(item)} className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase hover:bg-emerald-500 transition-colors">Vendido</button>
+                              </td >
+                            </>
+                          )}
                         </tr>
                       ))}
                     </tbody>
