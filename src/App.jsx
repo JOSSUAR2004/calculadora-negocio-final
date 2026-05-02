@@ -530,7 +530,7 @@ const App = () => {
                               </td>
 
                               {/* 3. TALLA */}
-                              <td className="p-6 text-center font-bold text-slate-800 uppercase">Talla {item.talla}</td>
+                              <td className="p-6 text-center font-bold text-slate-800 uppercase"> {item.talla}</td>
 
                               {/* 4. ACCIÓN */}
                               <td className="p-6 text-right space-x-4">
