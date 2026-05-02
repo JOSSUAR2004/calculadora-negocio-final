@@ -154,11 +154,13 @@ const App = () => {
 
           <nav className="flex bg-slate-100 p-1.5 rounded-2xl w-full lg:w-auto overflow-x-auto border border-slate-200">
             {[
-              { id: 'ventas', label: 'Sales', icon: '🛒' },
+              
               { id: 'camisetas', label: 'Camisetas', icon: '👕' },
               { id: 'zapatos', label: 'Guayos', icon: '👟' },
               { id: 'stock', label: 'Inventario', icon: '📦' },
-              { id: 'deudas', label: 'Cuentas', icon: '💸' }
+              { id: 'deudas', label: 'Cuentas', icon: '💸' },
+              { id: 'ventas', label: 'Sales', icon: '🛒' },
+
 
 
             ].map((tab) => (
@@ -467,7 +469,7 @@ const App = () => {
                               <td className="p-6 font-bold text-slate-800 uppercase">{item.referencia}</td>
                               <td className="p-6 text-center font-black text-orange-600">Talla {item.talla}</td>
                               <td className="p-6 text-right space-x-4">
-                                <button onClick={() => iniciarEdicion(item)} className="text-slate-400 hover:text-indigo-600 transition-colors">✏️ Editar</button>
+                                <button onClick={() => iniciarEdicion(item)} className="text-slate-400 hover:text-indigo-600 transition-colors"> Editar</button>
                                 <button onClick={() => registrarVenta(item)} className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase hover:bg-emerald-500 transition-colors">Vendido</button>
                               </td >
                             </>
