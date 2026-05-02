@@ -146,10 +146,11 @@ const App = () => {
 
           {/* TABLA Y HISTORIAL */}
           <main className="lg:col-span-8 space-y-6">
-            {/* 1. SECCIÓN STOCK: Solo visible cuando presionas el botón STOCK */}
+            {/* 1. SECCIÓN STOCK: Ocupa todo el ancho cuando está activa */}
             {modo === 'stock' && (
-              <div className="space-y-4 animate-in fade-in duration-300">
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+              <div className="w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Registrar Ingreso a Bodega</p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <Input
                       label="Referencia"
@@ -164,9 +165,9 @@ const App = () => {
                       onChange={v => setNewStock({ ...newStock, talla: v })}
                     />
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] font-black text-slate-400 uppercase mb-1">Versión</label>
+                      <label className="text-[10px] font-black text-slate-400 uppercase mb-1 px-1">Versión</label>
                       <select
-                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-bold text-sm"
+                        className="bg-slate-50 border border-slate-200 rounded-2xl p-3 outline-none font-bold text-sm h-[52px] appearance-none"
                         value={newStock.tipo}
                         onChange={e => setNewStock({ ...newStock, tipo: e.target.value })}
                       >
@@ -183,15 +184,15 @@ const App = () => {
                       setStock([{ id: Date.now(), ...newStock, referencia: newStock.referencia.toUpperCase(), talla: newStock.talla.toUpperCase() }, ...stock]);
                       setNewStock({ referencia: '', talla: '', tipo: 'player' });
                     }}
-                    className="w-full bg-slate-900 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg hover:bg-slate-800 transition-colors"
+                    className="w-full bg-slate-900 text-white p-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-[1.02] transition-all"
                   >
                     Guardar en Bodega
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {stock.map(s => (
-                    <div key={s.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
+                    <div key={s.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm group">
                       <div>
                         <div className="flex gap-2 mb-1">
                           <span className="text-[8px] font-black bg-slate-100 px-2 py-0.5 rounded text-slate-500 uppercase">{s.tipo}</span>
@@ -201,7 +202,7 @@ const App = () => {
                       </div>
                       <button
                         onClick={() => setStock(stock.filter(i => i.id !== s.id))}
-                        className="text-emerald-500 font-black text-[9px] bg-emerald-50 px-4 py-2 rounded-xl hover:bg-emerald-500 hover:text-white transition-all"
+                        className="text-emerald-500 font-black text-[9px] bg-emerald-50 px-4 py-2 rounded-xl group-hover:bg-emerald-500 group-hover:text-white transition-all"
                       >
                         VENDIDO
                       </button>
@@ -211,10 +212,10 @@ const App = () => {
               </div>
             )}
 
-            {/* 2. SECCIÓN DEUDAS: Solo visible cuando presionas el botón DEUDAS */}
+            {/* 2. SECCIÓN DEUDAS: Ocupa todo el ancho cuando está activa */}
             {modo === 'deudas' && (
-              <div className="space-y-4 animate-in fade-in duration-300">
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-3">
                   <Input label="Cliente" placeholder="Nombre del cliente" id="d-nom" />
                   <Input label="Monto COP" type="number" placeholder="Ej: 50000" id="d-val" />
                   <button
@@ -227,7 +228,7 @@ const App = () => {
                         document.querySelector('input[placeholder="Ej: 50000"]').value = '';
                       }
                     }}
-                    className="bg-red-500 text-white rounded-xl font-black text-xs uppercase h-[46px] mt-auto hover:bg-red-600 transition-colors"
+                    className="bg-red-500 text-white rounded-2xl font-black text-xs uppercase h-[52px] mt-auto shadow-lg hover:bg-red-600 transition-colors"
                   >
                     Registrar Deuda
                   </button>
@@ -236,12 +237,12 @@ const App = () => {
                   {deudas.map(d => (
                     <div key={d.id} className="bg-white p-5 rounded-2xl border border-red-50 flex justify-between items-center shadow-sm">
                       <div>
-                        <p className="text-[9px] font-black text-red-400 uppercase tracking-tighter">{d.cliente}</p>
-                        <p className="font-black text-slate-800 text-lg">{fmt(d.monto)}</p>
+                        <p className="text-[9px] font-black text-red-400 uppercase tracking-tighter mb-1">{d.cliente}</p>
+                        <p className="font-black text-slate-800 text-xl">{fmt(d.monto)}</p>
                       </div>
                       <button
                         onClick={() => setDeudas(deudas.filter(i => i.id !== d.id))}
-                        className="text-slate-200 hover:text-red-500 text-lg transition-colors"
+                        className="text-slate-200 hover:text-red-500 text-xl transition-colors p-2"
                       >
                         ✕
                       </button>
@@ -253,53 +254,55 @@ const App = () => {
 
             {/* 3. SECCIÓN COTIZACIÓN + HISTORIAL: Solo visibles en Camisetas o Zapatos */}
             {(modo === 'camisetas' || modo === 'zapatos') && (
-              <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="space-y-6 animate-in fade-in duration-500">
 
-                {/* TABLA DE COTIZACIÓN ACTUAL */}
-                <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-100 overflow-x-auto">
-                  <table className="w-full text-left min-w-[500px]">
-                    <thead className="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                      <tr>
-                        <th className="p-4 md:p-5">Producto</th>
-                        <th className="p-4 md:p-5 text-center text-emerald-500">Ganancia</th>
-                        <th className="p-4 md:p-5"></th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {items.map(item => {
-                        const { ganancia } = calcularValores(item, tasaCOP);
-                        return (
-                          <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                            <td className="p-4 md:p-5">
-                              <p className="font-bold text-slate-800 text-xs md:text-sm">{item.nombre}</p>
-                              <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase italic">
-                                {item.tipoItem === 'zapato' ? `Guayo (+ $${item.costoLogisticaUSD.toFixed(2)})` : `${item.tipo.toUpperCase()}`}
-                              </p>
-                            </td>
-                            <td className="p-4 md:p-5 text-center font-black text-emerald-500 text-xs md:text-sm">
-                              +{fmt(ganancia)}
-                            </td>
-                            <td className="p-4 md:p-5 text-right">
-                              <button
-                                onClick={() => setItems(items.filter(i => i.id !== item.id))}
-                                className="text-slate-300 hover:text-red-500 transition-colors"
-                              >
-                                ✕
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                {/* Contenedor de la Tabla */}
+                <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left min-w-[500px]">
+                      <thead className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <tr>
+                          <th className="p-5">Producto</th>
+                          <th className="p-5 text-center text-emerald-500">Ganancia Estimada</th>
+                          <th className="p-5"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {items.map(item => {
+                          const { ganancia } = calcularValores(item, tasaCOP);
+                          return (
+                            <tr key={item.id} className="hover:bg-slate-50/30 transition-colors">
+                              <td className="p-5">
+                                <p className="font-bold text-slate-800 text-sm uppercase">{item.nombre}</p>
+                                <p className="text-[9px] font-black text-slate-400 uppercase italic">
+                                  {item.tipoItem === 'zapato' ? `Guayo (+ $${item.costoLogisticaUSD.toFixed(2)})` : `${item.tipo.toUpperCase()}`}
+                                </p>
+                              </td>
+                              <td className="p-5 text-center font-black text-emerald-500 text-sm">
+                                +{fmt(ganancia)}
+                              </td>
+                              <td className="p-5 text-right">
+                                <button
+                                  onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                                  className="text-slate-300 hover:text-red-500 transition-colors"
+                                >
+                                  ✕
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
-                {/* CUADRO DE GANANCIA TOTAL (Solo si hay items) */}
+                {/* Cuadro de Ganancia Total */}
                 {items.length > 0 && (
-                  <div className="bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl border-b-4 border-emerald-500">
+                  <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl border-b-8 border-emerald-500 animate-in zoom-in-95 duration-300">
                     <div className="text-center md:text-left">
-                      <p className="text-slate-400 text-[9px] md:text-[10px] font-black uppercase mb-1">Ganancia Total Lote</p>
-                      <h2 className="text-3xl md:text-4xl font-black text-emerald-400">
+                      <p className="text-slate-400 text-[10px] font-black uppercase mb-1 tracking-[0.2em]">Ganancia Total Lote</p>
+                      <h2 className="text-4xl md:text-5xl font-black text-emerald-400 tracking-tighter">
                         {fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}
                       </h2>
                     </div>
@@ -318,30 +321,40 @@ const App = () => {
                         }, ...historial]);
                         setItems([]);
                       }}
-                      className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-8 py-4 rounded-xl md:rounded-2xl font-black text-[10px] uppercase shadow-lg transition-all active:scale-95"
+                      className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-10 py-5 rounded-2xl font-black text-xs uppercase shadow-lg transition-all active:scale-95"
                     >
-                      Guardar Registro
+                      Guardar en Historial
                     </button>
                   </div>
                 )}
 
-                {/* HISTORIAL DE COTIZACIONES (Solo se ve aquí) */}
-                <div className="space-y-4">
-                  <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Historial de Cotizaciones</h3>
+                {/* HISTORIAL: Al estar dentro de este bloque condicional, solo se ve en Jerseys/Guayos */}
+                <div className="space-y-4 pt-6">
+                  <div className="flex items-center gap-4 px-2">
+                    <div className="h-px flex-1 bg-slate-100"></div>
+                    <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Historial de Ventas</h3>
+                    <div className="h-px flex-1 bg-slate-100"></div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
                     {historial.map(h => (
-                      <div key={h.id} className="bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all">
+                      <div key={h.id} className="bg-white p-5 rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all group">
                         <div className="cursor-pointer flex-1" onClick={() => setLoteSeleccionado(h)}>
-                          <p className="text-[9px] md:text-[10px] font-black text-slate-700">{h.fecha}</p>
-                          <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase">
-                            {h.tipo} • {h.und} Und • <span className="text-indigo-500 font-black italic">VER DETALLE</span>
-                          </p>
+                          <p className="text-[10px] font-black text-slate-400 mb-1">{h.fecha}</p>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-md ${h.tipo === 'camisetas' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-600'}`}>
+                              {h.tipo === 'camisetas' ? 'JERSEY' : 'GUAYOS'}
+                            </span>
+                            <p className="text-[10px] font-bold text-slate-600 uppercase">
+                              {h.und} Unidades • <span className="text-indigo-600 font-black group-hover:underline text-[9px]">VER DETALLE</span>
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <p className="text-xs md:text-sm font-black text-emerald-500">{fmt(h.ganancia)}</p>
+                        <div className="flex items-center gap-4">
+                          <p className="text-sm font-black text-emerald-500 font-mono tracking-tight">{fmt(h.ganancia)}</p>
                           <button
                             onClick={() => setHistorial(historial.filter(item => item.id !== h.id))}
-                            className="text-slate-200 hover:text-red-500 p-2 transition-colors"
+                            className="text-slate-200 hover:text-red-500 transition-colors"
                           >
                             ✕
                           </button>
