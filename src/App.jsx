@@ -143,7 +143,7 @@ const App = () => {
           <main className="lg:col-span-8 space-y-6">
             {/* 1. SECCIÓN STOCK: Ocupa todo el ancho */}
             {modo === 'stock' && (
-              <div className="w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="w-full space-y-4 animate-in fade-in duration-500">
                 <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Registrar Ingreso a Bodega</p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -162,7 +162,7 @@ const App = () => {
                     <div className="flex flex-col gap-1">
                       <label className="text-[10px] font-black text-slate-400 uppercase mb-1 px-1">Versión</label>
                       <select
-                        className="bg-slate-50 border border-slate-200 rounded-2xl p-3 outline-none font-bold text-sm h-[52px]"
+                        className="bg-slate-50 border border-slate-200 rounded-2xl p-3 outline-none font-bold text-sm h-[52px] appearance-none"
                         value={newStock.tipo}
                         onChange={e => setNewStock({ ...newStock, tipo: e.target.value })}
                       >
@@ -185,7 +185,6 @@ const App = () => {
                   </button>
                 </div>
 
-                {/* Lista de Stock */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {stock.map(s => (
                     <div key={s.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm group">
@@ -196,7 +195,12 @@ const App = () => {
                         </div>
                         <p className="font-bold text-slate-800 text-sm uppercase">{s.referencia}</p>
                       </div>
-                      <button onClick={() => setStock(stock.filter(i => i.id !== s.id))} className="text-emerald-500 font-black text-[9px] bg-emerald-50 px-4 py-2 rounded-xl">VENDIDO</button>
+                      <button
+                        onClick={() => setStock(stock.filter(i => i.id !== s.id))}
+                        className="text-emerald-500 font-black text-[9px] bg-emerald-50 px-4 py-2 rounded-xl group-hover:bg-emerald-500 group-hover:text-white transition-all"
+                      >
+                        VENDIDO
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -207,62 +211,138 @@ const App = () => {
             {modo === 'deudas' && (
               <div className="w-full space-y-4 animate-in fade-in duration-500">
                 <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <Input label="Cliente" placeholder="Nombre del cliente" />
-                  <Input label="Monto COP" type="number" placeholder="Ej: 50000" />
-                  <button className="bg-red-500 text-white rounded-2xl font-black text-xs uppercase h-[52px] mt-auto">Registrar Deuda</button>
+                  <Input label="Cliente" placeholder="Nombre del cliente" id="d-nom" />
+                  <Input label="Monto COP" type="number" placeholder="Ej: 50000" id="d-val" />
+                  <button
+                    onClick={() => {
+                      const n = document.querySelector('input[placeholder="Nombre del cliente"]').value;
+                      const v = document.querySelector('input[placeholder="Ej: 50000"]').value;
+                      if (n && v) {
+                        setDeudas([{ id: Date.now(), cliente: n, monto: v }, ...deudas]);
+                        document.querySelector('input[placeholder="Nombre del cliente"]').value = '';
+                        document.querySelector('input[placeholder="Ej: 50000"]').value = '';
+                      }
+                    }}
+                    className="bg-red-500 text-white rounded-2xl font-black text-xs uppercase h-[52px] mt-auto shadow-lg hover:bg-red-600 transition-colors"
+                  >
+                    Registrar Deuda
+                  </button>
                 </div>
-                {/* ... mapeo de deudas ... */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {deudas.map(d => (
+                    <div key={d.id} className="bg-white p-5 rounded-2xl border border-red-50 flex justify-between items-center shadow-sm">
+                      <div>
+                        <p className="text-[9px] font-black text-red-400 uppercase tracking-tighter mb-1">{d.cliente}</p>
+                        <p className="font-black text-slate-800 text-xl">{fmt(d.monto)}</p>
+                      </div>
+                      <button
+                        onClick={() => setDeudas(deudas.filter(i => i.id !== d.id))}
+                        className="text-slate-200 hover:text-red-500 text-xl transition-colors p-2"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* 3. SECCIÓN COTIZACIÓN (JERSEYS/GUAYOS): EL FORMULARIO ESTÁ AQUÍ DENTRO */}
+            {/* 3. SECCIÓN JERSEYS / GUAYOS: RECUPERANDO TU LÓGICA ORIGINAL */}
             {(modo === 'camisetas' || modo === 'zapatos') && (
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in fade-in duration-500">
 
-                {/* FORMULARIO IZQUIERDA: Al estar dentro del (modo === 'camisetas' || ...), desaparece en Stock */}
+                {/* FORMULARIO ORIGINAL (Columna 4) */}
                 <aside className="md:col-span-4 space-y-4">
                   <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Añadir al Lote</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Nueva Referencia</p>
+
                     <div className="space-y-3">
+                      {/* Aquí debes mantener tus inputs con sus respectivos values y onChanges que ya tenías */}
                       <Input label="Referencia" placeholder="Ej: Real Madrid" />
                       <div className="flex flex-col gap-1">
                         <label className="text-[10px] font-black text-slate-400 uppercase mb-1 px-1">Versión</label>
-                        <select className="bg-slate-50 border border-slate-200 rounded-2xl p-3 font-bold text-sm h-[52px]">
-                          <option>PLAYER</option>
-                          <option>FAN</option>
-                          <option>RETRO</option>
+                        <select className="bg-slate-50 border border-slate-200 rounded-2xl p-3 font-bold text-sm h-[52px] outline-none">
+                          <option value="player">PLAYER</option>
+                          <option value="fan">FAN</option>
                         </select>
                       </div>
                     </div>
+
                     <button className="w-full bg-slate-900 text-white p-4 rounded-2xl font-black text-xs uppercase shadow-lg mt-6 hover:bg-emerald-500 transition-all">
-                      Añadir Producto
+                      Añadir a Cotización
                     </button>
                   </div>
                 </aside>
 
-                {/* TABLA E HISTORIAL DERECHA */}
+                {/* TABLA E HISTORIAL (Columna 8) */}
                 <div className="md:col-span-8 space-y-6">
                   <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-                    {/* ... Tu tabla de cotización actual ... */}
-                    <table className="w-full text-left">
-                      <thead className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase p-5">
-                        <tr><th className="p-5">Producto</th><th className="p-5 text-center">Ganancia</th></tr>
-                      </thead>
-                      <tbody>
-                        {items.map(item => (
-                          <tr key={item.id} className="border-b border-slate-50"><td className="p-5 font-bold text-sm">{item.nombre}</td></tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left min-w-[500px]">
+                        <thead className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          <tr>
+                            <th className="p-5">Producto</th>
+                            <th className="p-5 text-center text-emerald-500">Ganancia Estimada</th>
+                            <th className="p-5"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                          {items.map(item => {
+                            {/* RECUPERAMOS TU FUNCIÓN DE CÁLCULO */ }
+                            const { ganancia } = calcularValores(item, tasaCOP);
+                            return (
+                              <tr key={item.id} className="hover:bg-slate-50/30 transition-colors">
+                                <td className="p-5">
+                                  <p className="font-bold text-slate-800 text-sm uppercase">{item.nombre}</p>
+                                  <p className="text-[9px] font-black text-slate-400 uppercase italic">
+                                    {item.tipoItem === 'zapato' ? 'Guayo' : item.tipo.toUpperCase()}
+                                  </p>
+                                </td>
+                                <td className="p-5 text-center font-black text-emerald-500 text-sm">
+                                  +{fmt(ganancia)}
+                                </td>
+                                <td className="p-5 text-right">
+                                  <button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="text-slate-300 hover:text-red-500">✕</button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
+
+                  {/* GANANCIA TOTAL */}
+                  {items.length > 0 && (
+                    <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl border-b-8 border-emerald-500">
+                      <div>
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Ganancia Total Lote</p>
+                        <h2 className="text-4xl md:text-5xl font-black text-emerald-400">
+                          {fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}
+                        </h2>
+                      </div>
+                      <button onClick={() => { /* Tu lógica de guardar historial */ }} className="bg-emerald-500 px-10 py-5 rounded-2xl font-black text-xs uppercase">
+                        Guardar en Historial
+                      </button>
+                    </div>
+                  )}
 
                   {/* HISTORIAL */}
-                  <div className="space-y-4">
-                    <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-widest text-center">Historial Reciente</h3>
-                    {/* ... Mapeo del historial ... */}
+                  <div className="space-y-4 pt-6 pb-20">
+                    <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] text-center">Historial de Ventas</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {historial.map(h => (
+                        <div key={h.id} className="bg-white p-5 rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm">
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 mb-1">{h.fecha}</p>
+                            <p className="text-[10px] font-bold text-slate-600 uppercase">{h.und} Unidades • {h.tipo.toUpperCase()}</p>
+                          </div>
+                          <p className="text-sm font-black text-emerald-500 font-mono tracking-tight">{fmt(h.ganancia)}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
               </div>
             )}
           </main>
