@@ -294,35 +294,79 @@ const App = () => {
             )}
 
             {modo === 'ventas' && (
-              <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in">
-                {/* CABECERA CON BOTÓN DE LIMPIAR */}
-                <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
+              <div className="space-y-6 animate-in fade-in duration-300">
+                {/* BANNER DE RESUMEN */}
+                <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-xl flex justify-between items-center border-b-[6px] border-emerald-500">
                   <div>
-                    <p className="text-[10px] font-black uppercase opacity-60">Historial de Salidas</p>
-                    <h2 className="text-4xl font-black">{ventas.length} <span className="text-lg opacity-50">UND</span></h2>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Historial de Salidas Reales</p>
+                    <h2 className="text-4xl font-black tracking-tighter">
+                      {ventas.length} <span className="text-lg opacity-40 italic">Productos</span>
+                    </h2>
                   </div>
 
                   {ventas.length > 0 && (
                     <button
                       onClick={limpiarVentas}
-                      className="bg-red-500/10 hover:bg-red-500 border border-red-500/20 text-red-500 hover:text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase transition-all"
+                      className="bg-red-500/10 hover:bg-red-600 border border-red-500/20 text-red-500 hover:text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase transition-all shadow-lg active:scale-95"
                     >
-                      🗑️ Limpiar Historial
+                      🗑️ Limpiar Todo
                     </button>
                   )}
                 </div>
 
-                {/* TABLA (Se mantiene igual) */}
-                <table className="w-full text-left">
-                  {/* ... rest of your table code ... */}
-                </table>
+                {/* TABLA DE DETALLES */}
+                <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="text-[10px] font-black text-slate-400 uppercase bg-slate-50/50">
+                          <th className="p-6">Fecha y Hora</th>
+                          <th className="p-6">Producto / Referencia</th>
+                          <th className="p-6 text-center">Tipo</th>
+                          <th className="p-6 text-center">Talla</th>
+                          <th className="p-6 text-right">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {ventas.map((v) => (
+                          <tr key={v.idVenta} className="hover:bg-emerald-50/30 transition-colors">
+                            <td className="p-6">
+                              <div className="text-[10px] font-black text-slate-400 uppercase leading-none">{v.fechaVenta.split(',')[0]}</div>
+                              <div className="text-[9px] font-bold text-emerald-600 mt-1">{v.fechaVenta.split(',')[1]}</div>
+                            </td>
+                            <td className="p-6">
+                              <div className="font-black text-slate-800 text-sm uppercase">{v.referencia}</div>
+                              <div className="text-[9px] text-slate-400 font-bold italic">ID: {v.idVenta.toString().slice(-6)}</div>
+                            </td>
+                            <td className="p-6 text-center">
+                              <span className="text-[9px] font-black text-slate-500 bg-slate-100 px-2 py-1 rounded-md uppercase">
+                                {v.tipo}
+                              </span>
+                            </td>
+                            <td className="p-6 text-center">
+                              <span className="text-sm font-black text-slate-700">T{v.talla}</span>
+                            </td>
+                            <td className="p-6 text-right">
+                              <div className="flex flex-col items-end">
+                                <span className="text-emerald-500 font-black text-[10px] uppercase tracking-tighter">✓ Vendido</span>
+                                <span className="text-[8px] font-bold text-slate-300 uppercase">Salida Bodega</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
 
-                {/* MENSAJE SI ESTÁ VACÍO */}
-                {ventas.length === 0 && (
-                  <div className="p-20 text-center text-slate-300 font-black uppercase text-xs italic">
-                    No hay ventas registradas todavía
+                    {ventas.length === 0 && (
+                      <div className="p-20 text-center">
+                        <div className="text-4xl mb-4 opacity-20">📦</div>
+                        <p className="text-slate-300 font-black uppercase text-xs italic tracking-widest">
+                          Esperando la primera venta de Gol93Store...
+                        </p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             )}
 
