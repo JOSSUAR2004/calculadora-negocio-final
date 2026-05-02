@@ -242,7 +242,7 @@ const App = () => {
 
             {modo === 'stock' && (
               <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-5 animate-in fade-in duration-500">
-                <h3 className="text-xs font-black uppercase text-orange-500 italic tracking-widest">Nuevo Ingreso a stock</h3>
+                <h3 className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-indigo-100">Nuevo Ingreso a stock</h3>
                 <Input
                   label="Referencia / Equipo"
                   placeholder="Ej: Real Madrid Local"
@@ -286,7 +286,7 @@ const App = () => {
                     setStock([{ id: Date.now(), ...newStock }, ...stock]);
                     setNewStock({ referencia: '', talla: 'L', tipo: 'player' });
                   }}
-                  className="w-full bg-orange-500 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-orange-100 transition-all active:scale-95"
+                  className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-indigo-100"
                 >
                   Confirmar Entrada
                 </button>
