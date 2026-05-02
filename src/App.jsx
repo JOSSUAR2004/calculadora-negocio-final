@@ -93,11 +93,10 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
           <h1 className="text-xl md:text-2xl font-black italic uppercase text-slate-800">Gol93<span className="text-emerald-500">Store</span></h1>
           
           <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
-            <button onClick={() => {setModo('camisetas'); setItems([])}} className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[10px] md:text-xs transition-all ${modo === 'camisetas' ? 'bg-white shadow text-indigo-600' : 'text-slate-400'}`}>👕 JERSEY</button>
-            <button onClick={() => {setModo('zapatos'); setItems([])}} className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[10px] md:text-xs transition-all ${modo === 'zapatos' ? 'bg-white shadow text-emerald-600' : 'text-slate-400'}`}>👟 GUAYOS</button>
-            {/* Nuevos botones de modo */}
-            <button onClick={() => setModo('stock')} className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[10px] md:text-xs transition-all ${modo === 'stock' ? 'bg-white shadow text-slate-900' : 'text-slate-400'}`}>📦 STOCK</button>
-            <button onClick={() => setModo('deudas')} className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[10px] md:text-xs transition-all ${modo === 'deudas' ? 'bg-white shadow text-red-600' : 'text-slate-400'}`}>💸 DEUDAS</button>
+            <button onClick={() => setModo('camisetas')} className={`...`}>👕 JERSEY</button>
+            <button onClick={() => setModo('zapatos')} className={`...`}>👟 GUAYOS</button>
+            <button onClick={() => setModo('stock')} className={`...`}>📦 STOCK</button>
+            <button onClick={() => setModo('deudas')} className={`...`}>💸 DEUDAS</button>
           </div>
 
           <div className="bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto">
@@ -148,121 +147,133 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
           {/* TABLA Y HISTORIAL */}
           <main className="lg:col-span-8 space-y-6">
             {/* SECCIÓN STOCK DETALLADO */}
-              {modo === 'stock' && (
-                <div className="space-y-4 animate-in fade-in duration-300">
-                  <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <Input label="Referencia" placeholder="Ej: Real Madrid" value={newStock.referencia} onChange={v => setNewStock({...newStock, referencia: v})} />
-                      <Input label="Talla" placeholder="Ej: M" value={newStock.talla} onChange={v => setNewStock({...newStock, talla: v})} />
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase mb-1">Versión</label>
-                        <select className="bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-bold text-sm" value={newStock.tipo} onChange={e => setNewStock({...newStock, tipo: e.target.value})}>
-                          <option value="player">PLAYER</option>
-                          <option value="fan">FAN</option>
-                          <option value="retro">RETRO</option>
-                          <option value="guayo">GUAYO</option>
-                        </select>
-                      </div>
+             {/* 1. SECCIÓN STOCK: Solo visible cuando presionas el botón STOCK */}
+            {modo === 'stock' && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <Input label="Referencia" placeholder="Ej: Real Madrid" value={newStock.referencia} onChange={v => setNewStock({...newStock, referencia: v})} />
+                    <Input label="Talla" placeholder="Ej: M" value={newStock.talla} onChange={v => setNewStock({...newStock, talla: v})} />
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-black text-slate-400 uppercase mb-1">Versión</label>
+                      <select className="bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-bold text-sm" value={newStock.tipo} onChange={e => setNewStock({...newStock, tipo: e.target.value})}>
+                        <option value="player">PLAYER</option>
+                        <option value="fan">FAN</option>
+                        <option value="retro">RETRO</option>
+                        <option value="guayo">GUAYO</option>
+                      </select>
                     </div>
-                    <button onClick={() => {
-                      if(!newStock.referencia || !newStock.talla) return alert("Completa los datos");
-                      setStock([{id: Date.now(), ...newStock, referencia: newStock.referencia.toUpperCase(), talla: newStock.talla.toUpperCase()}, ...stock]);
-                      setNewStock({referencia: '', talla: '', tipo: 'player'});
-                    }} className="w-full bg-slate-900 text-white p-4 rounded-xl font-black text-xs uppercase">Guardar en Bodega</button>
                   </div>
+                  <button onClick={() => {
+                    if(!newStock.referencia || !newStock.talla) return alert("Completa los datos");
+                    setStock([{id: Date.now(), ...newStock, referencia: newStock.referencia.toUpperCase(), talla: newStock.talla.toUpperCase()}, ...stock]);
+                    setNewStock({referencia: '', talla: '', tipo: 'player'});
+                  }} className="w-full bg-slate-900 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg">Guardar en Bodega</button>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {stock.map(s => (
-                      <div key={s.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
-                        <div>
-                          <div className="flex gap-2 mb-1">
-                            <span className="text-[8px] font-black bg-slate-100 px-2 py-0.5 rounded text-slate-500 uppercase">{s.tipo}</span>
-                            <span className="text-[8px] font-black bg-indigo-50 px-2 py-0.5 rounded text-indigo-600">TALLA {s.talla}</span>
-                          </div>
-                          <p className="font-bold text-slate-800 text-sm uppercase">{s.referencia}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {stock.map(s => (
+                    <div key={s.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
+                      <div>
+                        <div className="flex gap-2 mb-1">
+                          <span className="text-[8px] font-black bg-slate-100 px-2 py-0.5 rounded text-slate-500 uppercase">{s.tipo}</span>
+                          <span className="text-[8px] font-black bg-indigo-50 px-2 py-0.5 rounded text-indigo-600 uppercase">Talla {s.talla}</span>
                         </div>
-                        <button onClick={() => setStock(stock.filter(i => i.id !== s.id))} className="bg-emerald-50 text-emerald-600 font-black text-[9px] px-4 py-2 rounded-xl hover:bg-emerald-500 hover:text-white transition-all">VENDIDO</button>
+                        <p className="font-bold text-slate-800 text-sm uppercase">{s.referencia}</p>
                       </div>
-                    ))}
-                  </div>
+                      <button onClick={() => setStock(stock.filter(i => i.id !== s.id))} className="text-emerald-500 font-black text-[9px] bg-emerald-50 px-4 py-2 rounded-xl hover:bg-emerald-500 hover:text-white transition-all">VENDIDO</button>
+                    </div>
+                  ))}
                 </div>
-              )}
-
-              {/* SECCIÓN DEUDAS */}
-              {modo === 'deudas' && (
-                <div className="space-y-4 animate-in fade-in duration-300">
-                  <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Input label="Cliente" placeholder="Nombre" id="d-nom" />
-                    <Input label="Monto COP" type="number" placeholder="0" id="d-val" />
-                    <button onClick={() => {
-                      const n = document.querySelector('input[placeholder="Nombre"]').value;
-                      const v = document.querySelector('input[placeholder="0"]').value;
-                      if(n && v) { setDeudas([{id: Date.now(), cliente: n, monto: v}, ...deudas]); }
-                    }} className="bg-red-500 text-white rounded-xl font-black text-xs uppercase h-[46px] mt-auto">Registrar</button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {deudas.map(d => (
-                      <div key={d.id} className="bg-white p-5 rounded-2xl border border-red-50 flex justify-between items-center shadow-sm">
-                        <div>
-                          <p className="text-[9px] font-black text-red-400 uppercase tracking-tighter">{d.cliente}</p>
-                          <p className="font-black text-slate-800 text-lg">{fmt(d.monto)}</p>
-                        </div>
-                        <button onClick={() => setDeudas(deudas.filter(i => i.id !== d.id))} className="text-slate-200 hover:text-red-500 text-lg">✕</button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}         
-            <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-100 overflow-x-auto">
-              <table className="w-full text-left min-w-[500px]">
-                <thead className="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  <tr>
-                    <th className="p-4 md:p-5">Producto</th>
-                    <th className="p-4 md:p-5 text-center text-emerald-500">Ganancia</th>
-                    <th className="p-4 md:p-5"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {items.map(item => {
-                    const { ganancia } = calcularValores(item, tasaCOP);
-                    return (
-                      <tr key={item.id}>
-                        <td className="p-4 md:p-5">
-                          <p className="font-bold text-slate-800 text-xs md:text-sm">{item.nombre}</p>
-                          <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase italic">
-                            {item.tipoItem === 'zapato' ? `Guayo (+ $${item.costoLogisticaUSD.toFixed(2)})` : `${item.tipo.toUpperCase()}`}
-                          </p>
-                        </td>
-                        <td className="p-4 md:p-5 text-center font-black text-emerald-500 text-xs md:text-sm">+{fmt(ganancia)}</td>
-                        <td className="p-4 md:p-5 text-right"><button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="text-slate-300 hover:text-red-500">✕</button></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {items.length > 0 && (
-              <div className="bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl border-b-4 border-emerald-500">
-                <div className="text-center md:text-left">
-                  <p className="text-slate-400 text-[9px] md:text-[10px] font-black uppercase mb-1">Ganancia Total Lote</p>
-                  <h2 className="text-3xl md:text-4xl font-black text-emerald-400">{fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}</h2>
-                </div>
-                <button onClick={() => {
-                  const finalItems = items.map(i => ({...i, ...calcularValores(i, tasaCOP)}));
-                  const totalG = finalItems.reduce((acc, i) => acc + i.ganancia, 0);
-                  setHistorial([{id: Date.now(), fecha: new Date().toLocaleString(), ganancia: totalG, und: items.length, tipo: modo, productos: finalItems, trm: tasaCOP}, ...historial]);
-                  setItems([]);
-                }} className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-8 py-4 rounded-xl md:rounded-2xl font-black text-[10px] uppercase shadow-lg">Guardar Registro</button>
               </div>
             )}
 
+            {/* 2. SECCIÓN DEUDAS: Solo visible cuando presionas el botón DEUDAS */}
+            {modo === 'deudas' && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Input label="Cliente" placeholder="Nombre del cliente" id="d-nom" />
+                  <Input label="Monto COP" type="number" placeholder="Ej: 50000" id="d-val" />
+                  <button onClick={() => {
+                    const n = document.querySelector('input[placeholder="Nombre del cliente"]').value;
+                    const v = document.querySelector('input[placeholder="Ej: 50000"]').value;
+                    if(n && v) { 
+                      setDeudas([{id: Date.now(), cliente: n, monto: v}, ...deudas]); 
+                      document.querySelector('input[placeholder="Nombre del cliente"]').value = '';
+                      document.querySelector('input[placeholder="Ej: 50000"]').value = '';
+                    }
+                  }} className="bg-red-500 text-white rounded-xl font-black text-xs uppercase h-[46px] mt-auto">Registrar Deuda</button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {deudas.map(d => (
+                    <div key={d.id} className="bg-white p-5 rounded-2xl border border-red-50 flex justify-between items-center shadow-sm">
+                      <div>
+                        <p className="text-[9px] font-black text-red-400 uppercase tracking-tighter">{d.cliente}</p>
+                        <p className="font-black text-slate-800 text-lg">{fmt(d.monto)}</p>
+                      </div>
+                      <button onClick={() => setDeudas(deudas.filter(i => i.id !== d.id))} className="text-slate-200 hover:text-red-500 text-lg">✕</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 3. SECCIÓN COTIZACIÓN: Visible solo en modo Jersey o Guayos */}
+            {(modo === 'camisetas' || modo === 'zapatos') && (
+              <>
+                <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-100 overflow-x-auto">
+                  <table className="w-full text-left min-w-[500px]">
+                    <thead className="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <tr>
+                        <th className="p-4 md:p-5">Producto</th>
+                        <th className="p-4 md:p-5 text-center text-emerald-500">Ganancia</th>
+                        <th className="p-4 md:p-5"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {items.map(item => {
+                        const { ganancia } = calcularValores(item, tasaCOP);
+                        return (
+                          <tr key={item.id}>
+                            <td className="p-4 md:p-5">
+                              <p className="font-bold text-slate-800 text-xs md:text-sm">{item.nombre}</p>
+                              <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase italic">
+                                {item.tipoItem === 'zapato' ? `Guayo (+ $${item.costoLogisticaUSD.toFixed(2)})` : `${item.tipo.toUpperCase()}`}
+                              </p>
+                            </td>
+                            <td className="p-4 md:p-5 text-center font-black text-emerald-500 text-xs md:text-sm">+{fmt(ganancia)}</td>
+                            <td className="p-4 md:p-5 text-right"><button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="text-slate-300 hover:text-red-500">✕</button></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {items.length > 0 && (
+                  <div className="bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl border-b-4 border-emerald-500">
+                    <div className="text-center md:text-left">
+                      <p className="text-slate-400 text-[9px] md:text-[10px] font-black uppercase mb-1">Ganancia Total Lote</p>
+                      <h2 className="text-3xl md:text-4xl font-black text-emerald-400">{fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}</h2>
+                    </div>
+                    <button onClick={() => {
+                      const finalItems = items.map(i => ({...i, ...calcularValores(i, tasaCOP)}));
+                      const totalG = finalItems.reduce((acc, i) => acc + i.ganancia, 0);
+                      setHistorial([{id: Date.now(), fecha: new Date().toLocaleString(), ganancia: totalG, und: items.length, tipo: modo, productos: finalItems, trm: tasaCOP}, ...historial]);
+                      setItems([]);
+                    }} className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-8 py-4 rounded-xl md:rounded-2xl font-black text-[10px] uppercase shadow-lg transition-colors">Guardar Registro</button>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* 4. HISTORIAL: Siempre visible abajo */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
               {historial.map(h => (
-                <div key={h.id} className="bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
+                <div key={h.id} className="bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all">
                   <div className="cursor-pointer flex-1" onClick={() => setLoteSeleccionado(h)}>
                     <p className="text-[9px] md:text-[10px] font-black text-slate-700">{h.fecha}</p>
-                    <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase leading-tight">{h.tipo} • {h.und} Und • <span className="text-indigo-500 font-black italic">DETALLE</span></p>
+                    <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase">{h.tipo} • {h.und} Und • <span className="text-indigo-500 font-black italic">DETALLE</span></p>
                   </div>
                   <div className="flex items-center gap-3">
                     <p className="text-xs md:text-sm font-black text-emerald-500">{fmt(h.ganancia)}</p>
