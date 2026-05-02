@@ -283,102 +283,115 @@ const App = () => {
               </div>
             )}
 
-            {/* 3. SECCIÓN COTIZACIÓN + HISTORIAL + FORMULARIO JERSEY: Todo agrupado */}
+            {/* 3. SECCIÓN COTIZACIÓN + HISTORIAL: Solo visibles en Camisetas o Zapatos */}
             {(modo === 'camisetas' || modo === 'zapatos') && (
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in fade-in duration-500">
+              <div className="space-y-6 animate-in fade-in duration-500">
 
-                {/* EL FORMULARIO DE JERSEY AHORA SOLO APARECE AQUÍ */}
-                <aside className="md:col-span-4 space-y-4">
-                  <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Nueva Referencia</p>
-                    {/* AQUÍ VAN TUS INPUTS DE REFERENCIA ACTUALES */}
-                    <div className="space-y-3">
-                      <Input label="Referencia" placeholder="Ej: Real Madrid" />
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase mb-1 px-1">Versión</label>
-                        <select className="bg-slate-50 border border-slate-200 rounded-2xl p-3 font-bold text-sm h-[52px] outline-none">
-                          <option>PLAYER</option>
-                          <option>FAN</option>
-                        </select>
-                      </div>
+                {/* Contenedor de la Tabla */}
+                <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left min-w-[500px]">
+                      <thead className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <tr>
+                          <th className="p-5">Producto</th>
+                          <th className="p-5 text-center text-emerald-500">Ganancia Estimada</th>
+                          <th className="p-5"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {items.map(item => {
+                          const { ganancia } = calcularValores(item, tasaCOP);
+                          return (
+                            <tr key={item.id} className="hover:bg-slate-50/30 transition-colors">
+                              <td className="p-5">
+                                <p className="font-bold text-slate-800 text-sm uppercase">{item.nombre}</p>
+                                <p className="text-[9px] font-black text-slate-400 uppercase italic">
+                                  {item.tipoItem === 'zapato' ? `Guayo (+ $${item.costoLogisticaUSD.toFixed(2)})` : `${item.tipo.toUpperCase()}`}
+                                </p>
+                              </td>
+                              <td className="p-5 text-center font-black text-emerald-500 text-sm">
+                                +{fmt(ganancia)}
+                              </td>
+                              <td className="p-5 text-right">
+                                <button
+                                  onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                                  className="text-slate-300 hover:text-red-500 transition-colors"
+                                >
+                                  ✕
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Cuadro de Ganancia Total */}
+                {items.length > 0 && (
+                  <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl border-b-8 border-emerald-500 animate-in zoom-in-95 duration-300">
+                    <div className="text-center md:text-left">
+                      <p className="text-slate-400 text-[10px] font-black uppercase mb-1 tracking-[0.2em]">Ganancia Total Lote</p>
+                      <h2 className="text-4xl md:text-5xl font-black text-emerald-400 tracking-tighter">
+                        {fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}
+                      </h2>
                     </div>
-                    <button className="w-full bg-slate-900 text-white p-4 rounded-2xl font-black text-xs uppercase shadow-lg mt-6 hover:bg-emerald-500 transition-all">
-                      Añadir a Cotización
+                    <button
+                      onClick={() => {
+                        const finalItems = items.map(i => ({ ...i, ...calcularValores(i, tasaCOP) }));
+                        const totalG = finalItems.reduce((acc, i) => acc + i.ganancia, 0);
+                        setHistorial([{
+                          id: Date.now(),
+                          fecha: new Date().toLocaleString(),
+                          ganancia: totalG,
+                          und: items.length,
+                          tipo: modo,
+                          productos: finalItems,
+                          trm: tasaCOP
+                        }, ...historial]);
+                        setItems([]);
+                      }}
+                      className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-10 py-5 rounded-2xl font-black text-xs uppercase shadow-lg transition-all active:scale-95"
+                    >
+                      Guardar en Historial
                     </button>
                   </div>
-                </aside>
+                )}
 
-                {/* TABLA E HISTORIAL (Ocupan las 8 columnas restantes) */}
-                <div className="md:col-span-8 space-y-6">
-                  <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left min-w-[500px]">
-                        <thead className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                          <tr>
-                            <th className="p-5">Producto</th>
-                            <th className="p-5 text-center text-emerald-500">Ganancia Estimada</th>
-                            <th className="p-5"></th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                          {items.map(item => {
-                            const { ganancia } = calcularValores(item, tasaCOP);
-                            return (
-                              <tr key={item.id} className="hover:bg-slate-50/30 transition-colors">
-                                <td className="p-5">
-                                  <p className="font-bold text-slate-800 text-sm uppercase">{item.nombre}</p>
-                                  <p className="text-[9px] font-black text-slate-400 uppercase italic">
-                                    {item.tipoItem === 'zapato' ? `Guayo` : `${item.tipo.toUpperCase()}`}
-                                  </p>
-                                </td>
-                                <td className="p-5 text-center font-black text-emerald-500 text-sm">+{fmt(ganancia)}</td>
-                                <td className="p-5 text-right">
-                                  <button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="text-slate-300 hover:text-red-500">✕</button>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
+                {/* HISTORIAL: Al estar dentro de este bloque condicional, solo se ve en Jerseys/Guayos */}
+                <div className="space-y-4 pt-6">
+                  <div className="flex items-center gap-4 px-2">
+                    <div className="h-px flex-1 bg-slate-100"></div>
+                    <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Historial de Ventas</h3>
+                    <div className="h-px flex-1 bg-slate-100"></div>
                   </div>
 
-                  {/* CUADRO DE GANANCIA TOTAL */}
-                  {items.length > 0 && (
-                    <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl border-b-8 border-emerald-500 animate-in zoom-in-95 duration-300">
-                      <div className="text-center md:text-left">
-                        <p className="text-slate-400 text-[10px] font-black uppercase mb-1 tracking-[0.2em]">Ganancia Total Lote</p>
-                        <h2 className="text-4xl md:text-5xl font-black text-emerald-400">
-                          {fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}
-                        </h2>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const totalG = items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0);
-                          setHistorial([{ id: Date.now(), fecha: new Date().toLocaleString(), ganancia: totalG, und: items.length, tipo: modo }, ...historial]);
-                          setItems([]);
-                        }}
-                        className="bg-emerald-500 hover:bg-emerald-600 px-10 py-5 rounded-2xl font-black text-xs uppercase"
-                      >
-                        Guardar en Historial
-                      </button>
-                    </div>
-                  )}
-
-                  {/* HISTORIAL */}
-                  <div className="space-y-4 pt-6">
-                    <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] text-center">Historial de Ventas</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {historial.map(h => (
-                        <div key={h.id} className="bg-white p-5 rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm">
-                          <div>
-                            <p className="text-[10px] font-black text-slate-400 mb-1">{h.fecha}</p>
-                            <p className="text-[10px] font-bold text-slate-600 uppercase">{h.und} Unidades • {h.tipo.toUpperCase()}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
+                    {historial.map(h => (
+                      <div key={h.id} className="bg-white p-5 rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all group">
+                        <div className="cursor-pointer flex-1" onClick={() => setLoteSeleccionado(h)}>
+                          <p className="text-[10px] font-black text-slate-400 mb-1">{h.fecha}</p>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-md ${h.tipo === 'camisetas' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-600'}`}>
+                              {h.tipo === 'camisetas' ? 'JERSEY' : 'GUAYOS'}
+                            </span>
+                            <p className="text-[10px] font-bold text-slate-600 uppercase">
+                              {h.und} Unidades • <span className="text-indigo-600 font-black group-hover:underline text-[9px]">VER DETALLE</span>
+                            </p>
                           </div>
-                          <p className="text-sm font-black text-emerald-500 font-mono tracking-tight">{fmt(h.ganancia)}</p>
                         </div>
-                      ))}
-                    </div>
+                        <div className="flex items-center gap-4">
+                          <p className="text-sm font-black text-emerald-500 font-mono tracking-tight">{fmt(h.ganancia)}</p>
+                          <button
+                            onClick={() => setHistorial(historial.filter(item => item.id !== h.id))}
+                            className="text-slate-200 hover:text-red-500 transition-colors"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
