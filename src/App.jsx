@@ -9,10 +9,6 @@ const App = () => {
   const [stock, setStock] = useState(() => JSON.parse(localStorage.getItem('g93_stock')) || []);
   const [deudas, setDeudas] = useState(() => JSON.parse(localStorage.getItem('g93_deudas')) || []);
   
-  // --- ESTADOS DE INTERFAZ ---
-  const [loteSeleccionado, setLoteSeleccionado] = useState(null);
-  const [cargando, setCargando] = useState(false);
-
   // --- SINCRONIZACIÓN LOCALSTORAGE ---
   useEffect(() => {
     localStorage.setItem('g93_tasa', JSON.stringify(tasaCOP));
@@ -36,12 +32,14 @@ const App = () => {
     fan: 125000, player: 140000, retro: 150000, longSleeve: 155000, children: 110000, nba: 180000, f1_nfl: 195000
   };
 
+  // --- ESTADOS DE INTERFAZ ---
+  const [loteSeleccionado, setLoteSeleccionado] = useState(null);
+  const [cargando, setCargando] = useState(false);
+
   // --- FORMULARIOS ---
   const [cajaZapatos, setCajaZapatos] = useState({ cantidadTotalCaja: 1 });
   const [newZapato, setNewZapato] = useState({ nombre: '', costoUSD: '', margen: 20, cantidad: 1 });
   const [newJersey, setNewJersey] = useState({ nombre: '', tipo: 'player', parches: 0, dorsal: false, cantidad: 1 });
-  
-  // ESTADO DE STOCK ACTUALIZADO
   const [newStock, setNewStock] = useState({ referencia: '', talla: 'L', tipo: 'player' });
 
   // --- LÓGICA DE CÁLCULO ---
@@ -204,18 +202,15 @@ const App = () => {
               </section>
             )}
 
-            {/* SECCIÓN MODIFICADA: INVENTARIO CON SELECTS */}
             {modo === 'stock' && (
               <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-5 animate-in fade-in duration-500">
                 <h3 className="text-xs font-black uppercase text-orange-500 italic tracking-widest">Nuevo Ingreso a Bodega</h3>
-                
                 <Input 
                   label="Referencia / Equipo" 
                   placeholder="Ej: Real Madrid Local"
                   value={newStock.referencia} 
                   onChange={v => setNewStock({...newStock, referencia: v})} 
                 />
-
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase px-1 tracking-wider">Tipo</label>
@@ -231,7 +226,6 @@ const App = () => {
                       <option value="nba">NBA</option>
                     </select>
                   </div>
-
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase px-1 tracking-wider">Talla</label>
                     <select 
@@ -248,7 +242,6 @@ const App = () => {
                     </select>
                   </div>
                 </div>
-
                 <button 
                   onClick={() => {
                     if(!newStock.referencia) return;
@@ -272,7 +265,7 @@ const App = () => {
                     const n = document.getElementById('d-nom').value;
                     const v = document.getElementById('d-val').value;
                     if(n && v) {
-                      setDeudas([{id: Date.now(), cliente: n, monto: v, fecha: new Date().toLocaleDateString()}, ...deudas]);
+                      setDeudas([{id: Date.now(), cliente: n, monto: parseFloat(v), fecha: new Date().toLocaleDateString()}, ...deudas]);
                       document.getElementById('d-nom').value = ''; document.getElementById('d-val').value = '';
                     }
                   }} 
@@ -362,38 +355,96 @@ const App = () => {
               </div>
             )}
 
-            {/* LISTADO DE STOCK */}
+            {/* SECCIÓN STOCK EN TABLA */}
             {modo === 'stock' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-in zoom-in-95 duration-300">
-                {stock.map(item => (
-                  <div key={item.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative group hover:shadow-lg transition-all">
-                    <p className="font-black text-slate-800 text-sm uppercase mb-1">{item.referencia}</p>
-                    <p className="text-[9px] font-black text-slate-400 uppercase mb-3 italic tracking-wider">{item.tipo}</p>
-                    <div className="flex justify-between items-end">
-                      <span className="text-[10px] font-black bg-orange-50 text-orange-600 px-3 py-1 rounded-full uppercase border border-orange-100">
-                        Talla {item.talla}
-                      </span>
-                      <button onClick={() => setStock(stock.filter(i => i.id !== item.id))} className="text-[9px] font-black bg-slate-900 text-white px-4 py-2 rounded-xl uppercase hover:bg-emerald-500 transition-colors shadow-lg shadow-slate-200">
-                        Vendido
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in duration-300">
+                <div className="p-6 border-b border-slate-50 flex justify-between bg-slate-50/50 items-center">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Inventario en Bodega</span>
+                  <span className="bg-orange-50 text-orange-600 text-[10px] font-black px-3 py-1 rounded-full">{stock.length} Artículos</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="text-[10px] font-black text-slate-400 uppercase">
+                        <th className="p-6">Referencia</th>
+                        <th className="p-6 text-center">Tipo</th>
+                        <th className="p-6 text-center">Talla</th>
+                        <th className="p-6 text-right">Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {stock.map(item => (
+                        <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                          <td className="p-6 font-bold text-slate-800 text-sm uppercase">{item.referencia}</td>
+                          <td className="p-6 text-center">
+                            <span className="text-[9px] font-black text-slate-400 uppercase italic bg-slate-100 px-2 py-1 rounded-md">{item.tipo}</span>
+                          </td>
+                          <td className="p-6 text-center">
+                            <span className="text-[10px] font-black text-orange-600">Talla {item.talla}</span>
+                          </td>
+                          <td className="p-6 text-right">
+                            <button 
+                              onClick={() => setStock(stock.filter(i => i.id !== item.id))}
+                              className="bg-slate-900 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase hover:bg-emerald-500 transition-colors"
+                            >
+                              Vendido
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {stock.length === 0 && <p className="p-10 text-center text-slate-300 font-bold uppercase text-xs">No hay productos en stock</p>}
+                </div>
               </div>
             )}
 
+            {/* SECCIÓN DEUDAS EN TABLA + TOTAL */}
             {modo === 'deudas' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-right duration-300">
-                {deudas.map(deuda => (
-                  <div key={deuda.id} className="bg-white p-6 rounded-[2rem] border-l-[6px] border-red-500 shadow-md flex justify-between items-center">
-                    <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase mb-1">{deuda.fecha}</p>
-                      <p className="font-black text-slate-800 text-lg uppercase leading-none mb-2">{deuda.cliente}</p>
-                      <p className="text-2xl font-black text-red-600 tracking-tighter">{fmt(deuda.monto)}</p>
-                    </div>
-                    <button onClick={() => setDeudas(deudas.filter(d => d.id !== deuda.id))} className="bg-red-50 text-red-400 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-red-500 hover:text-white transition-all">Pagado</button>
+              <div className="space-y-6 animate-in fade-in duration-300">
+                {/* Banner Total Deudas */}
+                <div className="bg-red-500 p-8 rounded-[2.5rem] text-white shadow-xl shadow-red-100 border-b-[6px] border-red-700 flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Total por Cobrar</p>
+                    <h2 className="text-4xl font-black tracking-tighter">
+                      {fmt(deudas.reduce((acc, d) => acc + d.monto, 0))}
+                    </h2>
                   </div>
-                ))}
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl">💸</div>
+                </div>
+
+                <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="text-[10px] font-black text-slate-400 uppercase">
+                          <th className="p-6">Fecha</th>
+                          <th className="p-6">Cliente</th>
+                          <th className="p-6 text-center">Monto</th>
+                          <th className="p-6 text-right">Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {deudas.map(deuda => (
+                          <tr key={deuda.id} className="hover:bg-red-50/30 transition-colors">
+                            <td className="p-6 text-[10px] font-black text-slate-400 uppercase">{deuda.fecha}</td>
+                            <td className="p-6 font-black text-slate-800 text-sm uppercase">{deuda.cliente}</td>
+                            <td className="p-6 text-center font-black text-red-600 text-md">{fmt(deuda.monto)}</td>
+                            <td className="p-6 text-right">
+                              <button 
+                                onClick={() => setDeudas(deudas.filter(d => d.id !== deuda.id))}
+                                className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase transition-all"
+                              >
+                                Marcar Pagado
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {deudas.length === 0 && <p className="p-10 text-center text-slate-300 font-bold uppercase text-xs">Cuentas al día</p>}
+                  </div>
+                </div>
               </div>
             )}
           </main>
