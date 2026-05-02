@@ -166,8 +166,9 @@ const App = () => {
               { id: 'camisetas', label: 'Camisetas', icon: '👕' },
               { id: 'zapatos', label: 'Guayos', icon: '👟' },
               { id: 'stock', label: 'Inventario', icon: '📦' },
-              { id: 'deudas', label: 'Cuentas', icon: '💸' },
               { id: 'ventas', label: 'Sales', icon: '🛒' },
+              { id: 'deudas', label: 'Cuentas', icon: '💸' },
+              
 
 
 
