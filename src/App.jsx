@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 
 const App = () => {
   const [tasaCOP, setTasaCOP] = useState(() => JSON.parse(localStorage.getItem('g93_tasa')) || 3600);
-  const [modo, setModo] = useState('camisetas'); 
+  const [modo, setModo] = useState('camisetas');
   const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('g93_items')) || []);
   const [historial, setHistorial] = useState(() => JSON.parse(localStorage.getItem('g93_historial')) || []);
   const [loteSeleccionado, setLoteSeleccionado] = useState(null);
   const [stock, setStock] = useState(() => JSON.parse(localStorage.getItem('g93_stock')) || []);
   const [deudas, setDeudas] = useState(() => JSON.parse(localStorage.getItem('g93_deudas')) || []);
 
-// Estado temporal para el formulario de stock detallado
-const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'player' });
+  // Estado temporal para el formulario de stock detallado
+  const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'player' });
 
   useEffect(() => {
     localStorage.setItem('g93_tasa', JSON.stringify(tasaCOP));
@@ -20,10 +20,10 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
     localStorage.setItem('g93_deudas', JSON.stringify(deudas));
   }, [tasaCOP, items, historial, stock, deudas]);
 
-  const COSTO_LIBRA = 3.10; 
+  const COSTO_LIBRA = 3.10;
   const ENVIO_CHINA_USA = 10;
   const CARGOS_FIJOS = 7;
-  const PESO_PAR_LB = 1.32; 
+  const PESO_PAR_LB = 1.32;
 
   const COSTOS_BASE_JERSEY = {
     fan: 13, player: 16, retro: 17, longSleeve: 17, children: 15, nba: 23, f1_nfl: 25
@@ -87,11 +87,11 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
   return (
     <div className="min-h-screen bg-slate-50 p-3 md:p-8 font-sans">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* HEADER RESPONSIVE */}
         <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100">
           <h1 className="text-xl md:text-2xl font-black italic uppercase text-slate-800">Gol93<span className="text-emerald-500">Store</span></h1>
-          
+
           <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
             <button onClick={() => setModo('camisetas')} className={`...`}>👕 JERSEY</button>
             <button onClick={() => setModo('zapatos')} className={`...`}>👟 GUAYOS</button>
@@ -111,34 +111,34 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
             {modo === 'zapatos' ? (
               <div className="space-y-4">
                 <div className="bg-slate-900 p-5 md:p-6 rounded-2xl md:rounded-3xl text-white border-b-4 border-emerald-500 shadow-xl">
-                  <InputDark label="Pares totales caja" type="number" value={cajaZapatos.cantidadTotalCaja} onChange={v => setCajaZapatos({cantidadTotalCaja: v})} />
+                  <InputDark label="Pares totales caja" type="number" value={cajaZapatos.cantidadTotalCaja} onChange={v => setCajaZapatos({ cantidadTotalCaja: v })} />
                 </div>
                 <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4">
-                  <Input label="Referencia Guayo" value={newZapato.nombre} onChange={v => setNewZapato({...newZapato, nombre: v})} />
+                  <Input label="Referencia Guayo" value={newZapato.nombre} onChange={v => setNewZapato({ ...newZapato, nombre: v })} />
                   <div className="grid grid-cols-2 gap-3">
-                    <Input label="Costo (USD)" type="number" value={newZapato.costoUSD} onChange={v => setNewZapato({...newZapato, costoUSD: v})} />
-                    <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({...newZapato, margen: v})} />
+                    <Input label="Costo (USD)" type="number" value={newZapato.costoUSD} onChange={v => setNewZapato({ ...newZapato, costoUSD: v })} />
+                    <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({ ...newZapato, margen: v })} />
                   </div>
-                  <Input label="Cantidad pares" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({...newZapato, cantidad: v})} />
+                  <Input label="Cantidad pares" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({ ...newZapato, cantidad: v })} />
                   <button onClick={agregarZapato} className="w-full bg-emerald-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg hover:bg-emerald-600 transition-colors">Añadir Guayos</button>
                 </div>
               </div>
             ) : (
               <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4 border-b-4 border-indigo-500">
-                <Input label="Referencia" value={newJersey.nombre} onChange={v => setNewJersey({...newJersey, nombre: v})} />
+                <Input label="Referencia" value={newJersey.nombre} onChange={v => setNewJersey({ ...newJersey, nombre: v })} />
                 <div className="flex flex-col gap-1">
                   <label className="text-[10px] font-black text-slate-400 uppercase">Versión</label>
-                  <select className="bg-slate-50 rounded-xl p-3 text-sm font-bold border border-slate-200 outline-none" value={newJersey.tipo} onChange={e => setNewJersey({...newJersey, tipo: e.target.value})}>
+                  <select className="bg-slate-50 rounded-xl p-3 text-sm font-bold border border-slate-200 outline-none" value={newJersey.tipo} onChange={e => setNewJersey({ ...newJersey, tipo: e.target.value })}>
                     {Object.keys(COSTOS_BASE_JERSEY).map(k => <option key={k} value={k}>{k.toUpperCase()}</option>)}
                   </select>
                 </div>
                 <div className="grid grid-cols-2 gap-3 items-end">
-                  <Input label="Parches" type="number" value={newJersey.parches} onChange={v => setNewJersey({...newJersey, parches: v})} />
-                  <button onClick={() => setNewJersey({...newJersey, dorsal: !newJersey.dorsal})} className={`p-3 rounded-xl border text-[9px] font-black h-[46px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 text-white' : 'bg-white text-slate-400'}`}>
+                  <Input label="Parches" type="number" value={newJersey.parches} onChange={v => setNewJersey({ ...newJersey, parches: v })} />
+                  <button onClick={() => setNewJersey({ ...newJersey, dorsal: !newJersey.dorsal })} className={`p-3 rounded-xl border text-[9px] font-black h-[46px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 text-white' : 'bg-white text-slate-400'}`}>
                     {newJersey.dorsal ? 'DORSAL' : 'NO DORSAL'}
                   </button>
                 </div>
-                <Input label="Unidades" type="number" value={newJersey.cantidad} onChange={v => setNewJersey({...newJersey, cantidad: v})} />
+                <Input label="Unidades" type="number" value={newJersey.cantidad} onChange={v => setNewJersey({ ...newJersey, cantidad: v })} />
                 <button onClick={agregarJersey} className="w-full bg-indigo-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg">Añadir Jersey</button>
               </div>
             )}
@@ -146,17 +146,30 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
 
           {/* TABLA Y HISTORIAL */}
           <main className="lg:col-span-8 space-y-6">
-            {/* SECCIÓN STOCK DETALLADO */}
-             {/* 1. SECCIÓN STOCK: Solo visible cuando presionas el botón STOCK */}
+            {/* 1. SECCIÓN STOCK: Solo visible cuando presionas el botón STOCK */}
             {modo === 'stock' && (
               <div className="space-y-4 animate-in fade-in duration-300">
                 <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Input label="Referencia" placeholder="Ej: Real Madrid" value={newStock.referencia} onChange={v => setNewStock({...newStock, referencia: v})} />
-                    <Input label="Talla" placeholder="Ej: M" value={newStock.talla} onChange={v => setNewStock({...newStock, talla: v})} />
+                    <Input
+                      label="Referencia"
+                      placeholder="Ej: Real Madrid"
+                      value={newStock.referencia}
+                      onChange={v => setNewStock({ ...newStock, referencia: v })}
+                    />
+                    <Input
+                      label="Talla"
+                      placeholder="Ej: M"
+                      value={newStock.talla}
+                      onChange={v => setNewStock({ ...newStock, talla: v })}
+                    />
                     <div className="flex flex-col gap-1">
                       <label className="text-[10px] font-black text-slate-400 uppercase mb-1">Versión</label>
-                      <select className="bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-bold text-sm" value={newStock.tipo} onChange={e => setNewStock({...newStock, tipo: e.target.value})}>
+                      <select
+                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-bold text-sm"
+                        value={newStock.tipo}
+                        onChange={e => setNewStock({ ...newStock, tipo: e.target.value })}
+                      >
                         <option value="player">PLAYER</option>
                         <option value="fan">FAN</option>
                         <option value="retro">RETRO</option>
@@ -164,11 +177,16 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
                       </select>
                     </div>
                   </div>
-                  <button onClick={() => {
-                    if(!newStock.referencia || !newStock.talla) return alert("Completa los datos");
-                    setStock([{id: Date.now(), ...newStock, referencia: newStock.referencia.toUpperCase(), talla: newStock.talla.toUpperCase()}, ...stock]);
-                    setNewStock({referencia: '', talla: '', tipo: 'player'});
-                  }} className="w-full bg-slate-900 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg">Guardar en Bodega</button>
+                  <button
+                    onClick={() => {
+                      if (!newStock.referencia || !newStock.talla) return alert("Completa los datos");
+                      setStock([{ id: Date.now(), ...newStock, referencia: newStock.referencia.toUpperCase(), talla: newStock.talla.toUpperCase() }, ...stock]);
+                      setNewStock({ referencia: '', talla: '', tipo: 'player' });
+                    }}
+                    className="w-full bg-slate-900 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg hover:bg-slate-800 transition-colors"
+                  >
+                    Guardar en Bodega
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -181,7 +199,12 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
                         </div>
                         <p className="font-bold text-slate-800 text-sm uppercase">{s.referencia}</p>
                       </div>
-                      <button onClick={() => setStock(stock.filter(i => i.id !== s.id))} className="text-emerald-500 font-black text-[9px] bg-emerald-50 px-4 py-2 rounded-xl hover:bg-emerald-500 hover:text-white transition-all">VENDIDO</button>
+                      <button
+                        onClick={() => setStock(stock.filter(i => i.id !== s.id))}
+                        className="text-emerald-500 font-black text-[9px] bg-emerald-50 px-4 py-2 rounded-xl hover:bg-emerald-500 hover:text-white transition-all"
+                      >
+                        VENDIDO
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -194,15 +217,20 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
                 <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-3">
                   <Input label="Cliente" placeholder="Nombre del cliente" id="d-nom" />
                   <Input label="Monto COP" type="number" placeholder="Ej: 50000" id="d-val" />
-                  <button onClick={() => {
-                    const n = document.querySelector('input[placeholder="Nombre del cliente"]').value;
-                    const v = document.querySelector('input[placeholder="Ej: 50000"]').value;
-                    if(n && v) { 
-                      setDeudas([{id: Date.now(), cliente: n, monto: v}, ...deudas]); 
-                      document.querySelector('input[placeholder="Nombre del cliente"]').value = '';
-                      document.querySelector('input[placeholder="Ej: 50000"]').value = '';
-                    }
-                  }} className="bg-red-500 text-white rounded-xl font-black text-xs uppercase h-[46px] mt-auto">Registrar Deuda</button>
+                  <button
+                    onClick={() => {
+                      const n = document.querySelector('input[placeholder="Nombre del cliente"]').value;
+                      const v = document.querySelector('input[placeholder="Ej: 50000"]').value;
+                      if (n && v) {
+                        setDeudas([{ id: Date.now(), cliente: n, monto: v }, ...deudas]);
+                        document.querySelector('input[placeholder="Nombre del cliente"]').value = '';
+                        document.querySelector('input[placeholder="Ej: 50000"]').value = '';
+                      }
+                    }}
+                    className="bg-red-500 text-white rounded-xl font-black text-xs uppercase h-[46px] mt-auto hover:bg-red-600 transition-colors"
+                  >
+                    Registrar Deuda
+                  </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {deudas.map(d => (
@@ -211,16 +239,23 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
                         <p className="text-[9px] font-black text-red-400 uppercase tracking-tighter">{d.cliente}</p>
                         <p className="font-black text-slate-800 text-lg">{fmt(d.monto)}</p>
                       </div>
-                      <button onClick={() => setDeudas(deudas.filter(i => i.id !== d.id))} className="text-slate-200 hover:text-red-500 text-lg">✕</button>
+                      <button
+                        onClick={() => setDeudas(deudas.filter(i => i.id !== d.id))}
+                        className="text-slate-200 hover:text-red-500 text-lg transition-colors"
+                      >
+                        ✕
+                      </button>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* 3. SECCIÓN COTIZACIÓN: Visible solo en modo Jersey o Guayos */}
+            {/* 3. SECCIÓN COTIZACIÓN + HISTORIAL: Solo visibles en Camisetas o Zapatos */}
             {(modo === 'camisetas' || modo === 'zapatos') && (
-              <>
+              <div className="space-y-6 animate-in fade-in duration-300">
+
+                {/* TABLA DE COTIZACIÓN ACTUAL */}
                 <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-100 overflow-x-auto">
                   <table className="w-full text-left min-w-[500px]">
                     <thead className="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -234,15 +269,24 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
                       {items.map(item => {
                         const { ganancia } = calcularValores(item, tasaCOP);
                         return (
-                          <tr key={item.id}>
+                          <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                             <td className="p-4 md:p-5">
                               <p className="font-bold text-slate-800 text-xs md:text-sm">{item.nombre}</p>
                               <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase italic">
                                 {item.tipoItem === 'zapato' ? `Guayo (+ $${item.costoLogisticaUSD.toFixed(2)})` : `${item.tipo.toUpperCase()}`}
                               </p>
                             </td>
-                            <td className="p-4 md:p-5 text-center font-black text-emerald-500 text-xs md:text-sm">+{fmt(ganancia)}</td>
-                            <td className="p-4 md:p-5 text-right"><button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="text-slate-300 hover:text-red-500">✕</button></td>
+                            <td className="p-4 md:p-5 text-center font-black text-emerald-500 text-xs md:text-sm">
+                              +{fmt(ganancia)}
+                            </td>
+                            <td className="p-4 md:p-5 text-right">
+                              <button
+                                onClick={() => setItems(items.filter(i => i.id !== item.id))}
+                                className="text-slate-300 hover:text-red-500 transition-colors"
+                              >
+                                ✕
+                              </button>
+                            </td>
                           </tr>
                         );
                       })}
@@ -250,38 +294,64 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
                   </table>
                 </div>
 
+                {/* CUADRO DE GANANCIA TOTAL (Solo si hay items) */}
                 {items.length > 0 && (
                   <div className="bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl border-b-4 border-emerald-500">
                     <div className="text-center md:text-left">
                       <p className="text-slate-400 text-[9px] md:text-[10px] font-black uppercase mb-1">Ganancia Total Lote</p>
-                      <h2 className="text-3xl md:text-4xl font-black text-emerald-400">{fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}</h2>
+                      <h2 className="text-3xl md:text-4xl font-black text-emerald-400">
+                        {fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}
+                      </h2>
                     </div>
-                    <button onClick={() => {
-                      const finalItems = items.map(i => ({...i, ...calcularValores(i, tasaCOP)}));
-                      const totalG = finalItems.reduce((acc, i) => acc + i.ganancia, 0);
-                      setHistorial([{id: Date.now(), fecha: new Date().toLocaleString(), ganancia: totalG, und: items.length, tipo: modo, productos: finalItems, trm: tasaCOP}, ...historial]);
-                      setItems([]);
-                    }} className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-8 py-4 rounded-xl md:rounded-2xl font-black text-[10px] uppercase shadow-lg transition-colors">Guardar Registro</button>
+                    <button
+                      onClick={() => {
+                        const finalItems = items.map(i => ({ ...i, ...calcularValores(i, tasaCOP) }));
+                        const totalG = finalItems.reduce((acc, i) => acc + i.ganancia, 0);
+                        setHistorial([{
+                          id: Date.now(),
+                          fecha: new Date().toLocaleString(),
+                          ganancia: totalG,
+                          und: items.length,
+                          tipo: modo,
+                          productos: finalItems,
+                          trm: tasaCOP
+                        }, ...historial]);
+                        setItems([]);
+                      }}
+                      className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-8 py-4 rounded-xl md:rounded-2xl font-black text-[10px] uppercase shadow-lg transition-all active:scale-95"
+                    >
+                      Guardar Registro
+                    </button>
                   </div>
                 )}
-              </>
-            )}
 
-            {/* 4. HISTORIAL: Siempre visible abajo */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
-              {historial.map(h => (
-                <div key={h.id} className="bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all">
-                  <div className="cursor-pointer flex-1" onClick={() => setLoteSeleccionado(h)}>
-                    <p className="text-[9px] md:text-[10px] font-black text-slate-700">{h.fecha}</p>
-                    <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase">{h.tipo} • {h.und} Und • <span className="text-indigo-500 font-black italic">DETALLE</span></p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-xs md:text-sm font-black text-emerald-500">{fmt(h.ganancia)}</p>
-                    <button onClick={() => setHistorial(historial.filter(item => item.id !== h.id))} className="text-slate-200 hover:text-red-500 p-2">✕</button>
+                {/* HISTORIAL DE COTIZACIONES (Solo se ve aquí) */}
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Historial de Cotizaciones</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
+                    {historial.map(h => (
+                      <div key={h.id} className="bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all">
+                        <div className="cursor-pointer flex-1" onClick={() => setLoteSeleccionado(h)}>
+                          <p className="text-[9px] md:text-[10px] font-black text-slate-700">{h.fecha}</p>
+                          <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase">
+                            {h.tipo} • {h.und} Und • <span className="text-indigo-500 font-black italic">VER DETALLE</span>
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <p className="text-xs md:text-sm font-black text-emerald-500">{fmt(h.ganancia)}</p>
+                          <button
+                            onClick={() => setHistorial(historial.filter(item => item.id !== h.id))}
+                            className="text-slate-200 hover:text-red-500 p-2 transition-colors"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </main>
         </div>
       </div>
@@ -297,7 +367,7 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
               </div>
               <button onClick={() => setLoteSeleccionado(null)} className="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center font-black text-slate-400 text-sm">✕</button>
             </div>
-            
+
             <div className="overflow-x-auto flex-1">
               <table className="w-full min-w-[450px]">
                 <thead className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase border-b border-slate-50 bg-slate-50/50">
@@ -325,8 +395,8 @@ const [newStock, setNewStock] = useState({ referencia: '', talla: '', tipo: 'pla
             </div>
 
             <div className="p-6 md:p-8 bg-emerald-500 text-white flex justify-between items-center">
-               <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Total Ganancia</span>
-               <span className="text-xl md:text-2xl font-black">{fmt(loteSeleccionado.ganancia)}</span>
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Total Ganancia</span>
+              <span className="text-xl md:text-2xl font-black">{fmt(loteSeleccionado.ganancia)}</span>
             </div>
           </div>
         </div>
