@@ -344,7 +344,7 @@ const App = () => {
                               </span>
                             </td>
                             <td className="p-6 text-center">
-                              <span className="text-sm font-black text-slate-700">T{v.talla}</span>
+                              <span className="text-sm font-black text-slate-700">{v.talla}</span>
                             </td>
                             <td className="p-6 text-right">
                               <div className="flex flex-col items-end">
