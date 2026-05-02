@@ -89,8 +89,9 @@ const App = () => {
       <div className="max-w-6xl mx-auto">
 
         {/* HEADER RESPONSIVE */}
-        <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100">
-          {/* Logo GOL93STORE */}
+        <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6 bg-slate-900 p-6 rounded-[2.5rem] shadow-2xl border border-slate-800">
+
+          {/* Logo GOL93STORE - Ahora visible sobre fondo oscuro */}
           <h1 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-white">
             Gol93<span className="text-emerald-500">Store</span>
           </h1>
@@ -109,7 +110,7 @@ const App = () => {
                 className={`
           flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black tracking-wider transition-all duration-300
           ${modo === btn.id
-                    ? 'bg-emerald-500 text-slate-900 shadow-[0_0_15px_rgba(16,185,129,0.4)] scale-105'
+                    ? 'bg-emerald-500 text-slate-900 shadow-[0_0_20px_rgba(16,185,129,0.5)] scale-105'
                     : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'
                   }
         `}
@@ -120,9 +121,8 @@ const App = () => {
             ))}
           </nav>
 
-
           {/* TRM Actual */}
-          <div className="bg-slate-800 px-5 py-3 rounded-2xl border border-slate-700 flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto min-w-[140px]">
+          <div className="bg-slate-800/80 px-5 py-3 rounded-2xl border border-slate-700 flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto min-w-[150px]">
             <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-0 md:mb-1">TRM Actual</span>
             <div className="flex items-center">
               <span className="text-emerald-500 font-black mr-1">$</span>
