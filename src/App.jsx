@@ -211,7 +211,7 @@ const App = () => {
                     <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({ ...newZapato, margen: v })} />
                   </div>
                   <Input label="Cantidad" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({ ...newZapato, cantidad: v })} />
-                  <button onClick={agregarZapato} className="w-full bg-emerald-500 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-emerald-100">Registrar en Lote</button>
+                  <button onClick={agregarZapato} className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-indigo-100">Registrar en Lote</button>
                 </div>
               </section>
             )}
@@ -267,7 +267,7 @@ const App = () => {
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase px-1 tracking-wider">Talla</label>
                     <select
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none font-bold text-slate-700 text-sm focus:ring-2 ring-orange-500/20 focus:border-orange-500 transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none font-bold text-slate-700 text-sm focus:ring-2 ring-orange-500/20 focus:border-white-500 transition-all"
                       value={newStock.talla}
                       onChange={e => setNewStock({ ...newStock, talla: e.target.value })}
                     >
@@ -454,7 +454,7 @@ const App = () => {
                         {fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}
                       </h2>
                     </div>
-                    <button onClick={guardarLotePrincipal} className="w-full md:w-auto bg-emerald-500 px-10 py-5 rounded-2xl font-black text-xs uppercase shadow-xl active:scale-95 transition-transform">
+                    <button onClick={guardarLotePrincipal} className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-indigo-100">
                       {cargando ? 'Procesando...' : 'Finalizar y Guardar'}
                     </button>
                   </div>
@@ -484,7 +484,7 @@ const App = () => {
               <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in duration-300">
                 <div className="p-6 border-b border-slate-50 flex justify-between bg-slate-50/50 items-center">
                   <span className="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Inventario en Bodega</span>
-                  <span className="bg-orange-50 text-orange-600 text-[10px] font-black px-3 py-1 rounded-full">{stock.length} Artículos</span>
+                  <span className="bg-orange-50 text-white-600 text-[10px] font-black px-3 py-1 rounded-full">{stock.length} Artículos</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
@@ -521,7 +521,7 @@ const App = () => {
                             // --- VISTA NORMAL ---
                             <>
                               <td className="p-6 font-bold text-slate-800 uppercase">{item.referencia}</td>
-                              <td className="p-6 text-center font-black text-orange-600">Talla {item.talla}</td>
+                              <td className="p-6 font-bold text-slate-800 uppercase">Talla {item.talla}</td>
                               <td className="p-6 text-right space-x-4">
                                 <button onClick={() => iniciarEdicion(item)} className="text-slate-400 hover:text-indigo-600 transition-colors"> Editar</button>
                                 <button onClick={() => registrarVenta(item)} className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase hover:bg-emerald-500 transition-colors">Vendido</button>
