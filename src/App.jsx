@@ -1,75 +1,57 @@
 import React, { useState, useEffect } from 'react';
 
 const App = () => {
-  const [tasaCOP, setTasaCOP] = useState(() => JSON.parse(localStorage.getItem('g93_tasa')) || 3600);
+  // --- ESTADOS Y PERSISTENCIA ---
+  const [tasaCOP, setTasaCOP] = useState(() => JSON.parse(localStorage.getItem('g93_tasa')) || 4000);
   const [modo, setModo] = useState('camisetas'); 
-  const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('g93_items')) || []);
+  const [items, setItems] = useState([]); 
   const [historial, setHistorial] = useState(() => JSON.parse(localStorage.getItem('g93_historial')) || []);
-  const [loteSeleccionado, setLoteSeleccionado] = useState(null);
+  const [stock, setStock] = useState(() => JSON.parse(localStorage.getItem('g93_stock')) || []);
+  const [deudas, setDeudas] = useState(() => JSON.parse(localStorage.getItem('g93_deudas')) || []);
 
   useEffect(() => {
     localStorage.setItem('g93_tasa', JSON.stringify(tasaCOP));
-    localStorage.setItem('g93_items', JSON.stringify(items));
     localStorage.setItem('g93_historial', JSON.stringify(historial));
-  }, [tasaCOP, items, historial]);
+    localStorage.setItem('g93_stock', JSON.stringify(stock));
+    localStorage.setItem('g93_deudas', JSON.stringify(deudas));
+  }, [tasaCOP, historial, stock, deudas]);
 
+  // --- CONSTANTES LÓGICA ---
   const COSTO_LIBRA = 3.10; 
   const ENVIO_CHINA_USA = 10;
   const CARGOS_FIJOS = 7;
   const PESO_PAR_LB = 1.32; 
 
-  const COSTOS_BASE_JERSEY = {
-    fan: 13, player: 16, retro: 17, longSleeve: 17, children: 15, nba: 23, f1_nfl: 25
-  };
-
-  const PRECIOS_VENTA_JERSEY = {
-    fan: 125000, player: 140000, retro: 150000, longSleeve: 155000, children: 110000, nba: 180000, f1_nfl: 195000
-  };
+  const COSTOS_BASE_JERSEY = { fan: 13, player: 16, retro: 17, children: 15, nba: 23 };
+  const PRECIOS_VENTA_JERSEY = { fan: 125000, player: 140000, retro: 150000, children: 110000, nba: 180000 };
 
   const [cajaZapatos, setCajaZapatos] = useState({ cantidadTotalCaja: 1 });
-  const [newZapato, setNewZapato] = useState({ nombre: '', costoUSD: '', margen: 20, cantidad: 1 });
-  const [newJersey, setNewJersey] = useState({ nombre: '', tipo: 'player', parches: 0, dorsal: false, cantidad: 1 });
+  const [newZapato, setNewZapato] = useState({ nombre: '', costoUSD: '', margen: 30 });
+  const [newJersey, setNewJersey] = useState({ nombre: '', tipo: 'player', parches: 0, dorsal: false });
 
   const agregarZapato = () => {
-    if (!newZapato.nombre || !newZapato.costoUSD) return alert("Completa los datos");
-    const nTotalCaja = parseInt(cajaZapatos.cantidadTotalCaja) || 1;
-    const pesoCajaTotal = nTotalCaja * PESO_PAR_LB;
-    const logisticaPorParUSD = (ENVIO_CHINA_USA + CARGOS_FIJOS + (pesoCajaTotal * COSTO_LIBRA)) / nTotalCaja;
-
-    const nuevos = Array.from({ length: parseInt(newZapato.cantidad) || 1 }, (_, i) => ({
-      ...newZapato,
-      id: Date.now() + Math.random(),
-      costoLogisticaUSD: logisticaPorParUSD,
-      tipoItem: 'zapato',
-      trmRegistro: tasaCOP
-    }));
-    setItems([...items, ...nuevos]);
-    setNewZapato({ ...newZapato, nombre: '', costoUSD: '', margen: 30, cantidad: 1 });
+    if (!newZapato.nombre || !newZapato.costoUSD) return;
+    const nTotal = parseInt(cajaZapatos.cantidadTotalCaja) || 1;
+    const logisticaUSD = (ENVIO_CHINA_USA + CARGOS_FIJOS + (nTotal * PESO_PAR_LB * COSTO_LIBRA)) / nTotal;
+    setItems([...items, { ...newZapato, id: Date.now(), logisticaUSD, tipoItem: 'zapato' }]);
+    setNewZapato({ ...newZapato, nombre: '', costoUSD: '' });
   };
 
   const agregarJersey = () => {
-    if (!newJersey.nombre) return alert("Escribe el nombre del equipo");
-    const nuevos = Array.from({ length: parseInt(newJersey.cantidad) || 1 }, (_, i) => ({
-      ...newJersey,
-      id: Date.now() + Math.random(),
-      costoBaseUSD: COSTOS_BASE_JERSEY[newJersey.tipo],
-      tipoItem: 'camiseta',
-      trmRegistro: tasaCOP
-    }));
-    setItems([...items, ...nuevos]);
-    setNewJersey({ ...newJersey, nombre: '', parches: 0, dorsal: false, cantidad: 1 });
+    if (!newJersey.nombre) return;
+    setItems([...items, { ...newJersey, id: Date.now(), tipoItem: 'camiseta' }]);
+    setNewJersey({ ...newJersey, nombre: '', parches: 0, dorsal: false });
   };
 
-  const calcularValores = (item, trm) => {
+  const calcular = (item) => {
     if (item.tipoItem === 'zapato') {
-      const costoTotalUSD = parseFloat(item.costoUSD) + item.costoLogisticaUSD;
-      const costoCOP = costoTotalUSD * trm;
+      const costoUSD = parseFloat(item.costoUSD) + item.logisticaUSD;
+      const costoCOP = costoUSD * tasaCOP;
       const venta = costoCOP / (1 - (item.margen / 100));
       return { costoCOP, venta, ganancia: venta - costoCOP };
     } else {
-      const costoExtrasUSD = (item.dorsal ? 1 : 0) + (parseInt(item.parches) || 0);
-      const costoTotalUSD = item.costoBaseUSD + costoExtrasUSD;
-      const costoCOP = costoTotalUSD * trm;
+      const extras = (item.dorsal ? 1 : 0) + (parseInt(item.parches) || 0);
+      const costoCOP = (COSTOS_BASE_JERSEY[item.tipo] + extras) * tasaCOP;
       const venta = PRECIOS_VENTA_JERSEY[item.tipo];
       return { costoCOP, venta, ganancia: venta - costoCOP };
     }
@@ -78,188 +60,175 @@ const App = () => {
   const fmt = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-3 md:p-8 font-sans">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-50 p-4 font-sans text-slate-900">
+      <div className="max-w-5xl mx-auto space-y-6">
         
-        {/* HEADER RESPONSIVE */}
-        <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100">
-          <h1 className="text-xl md:text-2xl font-black italic uppercase text-slate-800">Gol93<span className="text-emerald-500">Store</span></h1>
+        {/* NAV PRINCIPAL */}
+        <div className="bg-white p-4 rounded-[2rem] shadow-sm flex flex-wrap justify-between items-center gap-4">
+          <h1 className="font-black italic text-2xl tracking-tighter">GOL93<span className="text-emerald-500">STORE</span></h1>
+          <div className="flex bg-slate-100 p-1 rounded-2xl">
+            {['camisetas', 'zapatos', 'stock', 'deudas'].map(m => (
+              <button key={m} onClick={() => setModo(m)} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${modo === m ? 'bg-white shadow text-indigo-600' : 'text-slate-400'}`}>{m}</button>
+            ))}
+          </div>
+          <div className="bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 flex items-center gap-2">
+            <span className="text-[9px] font-black text-emerald-600">TRM</span>
+            <input type="number" value={tasaCOP} onChange={e => setTasaCOP(e.target.value)} className="bg-transparent font-bold w-16 text-right outline-none text-emerald-900" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
-            <button onClick={() => {setModo('camisetas'); setItems([])}} className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[10px] md:text-xs transition-all ${modo === 'camisetas' ? 'bg-white shadow text-indigo-600' : 'text-slate-400'}`}>👕 JERSEY</button>
-            <button onClick={() => {setModo('zapatos'); setItems([])}} className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[10px] md:text-xs transition-all ${modo === 'zapatos' ? 'bg-white shadow text-emerald-600' : 'text-slate-400'}`}>👟 GUAYOS</button>
-          </div>
-
-          <div className="bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto">
-            <span className="text-[9px] font-black text-emerald-600 uppercase mr-2 md:mr-0">TRM Actual</span>
-            <input type="number" value={tasaCOP} onChange={(e) => setTasaCOP(parseFloat(e.target.value) || 0)} className="bg-transparent border-none outline-none text-lg font-black text-emerald-800 w-20 md:w-24 text-right" />
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          {/* FORMULARIOS */}
-          <aside className="lg:col-span-4 space-y-4 md:space-y-6">
-            {modo === 'zapatos' ? (
-              <div className="space-y-4">
-                <div className="bg-slate-900 p-5 md:p-6 rounded-2xl md:rounded-3xl text-white border-b-4 border-emerald-500 shadow-xl">
-                  <InputDark label="Pares totales caja" type="number" value={cajaZapatos.cantidadTotalCaja} onChange={v => setCajaZapatos({cantidadTotalCaja: v})} />
+          {/* FORMULARIOS IZQUIERDA */}
+          <div className="lg:col-span-4 space-y-4">
+            {modo === 'camisetas' && (
+              <div className="bg-white p-6 rounded-[2.5rem] border-b-8 border-indigo-500 shadow-xl space-y-4">
+                <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Cotizador Jersey</p>
+                <input type="text" placeholder="EQUIPO" className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm border border-slate-100" value={newJersey.nombre} onChange={e => setNewJersey({...newJersey, nombre: e.target.value.toUpperCase()})} />
+                <select className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm border border-slate-100" value={newJersey.tipo} onChange={e => setNewJersey({...newJersey, tipo: e.target.value})}>
+                  {Object.keys(COSTOS_BASE_JERSEY).map(k => <option key={k} value={k}>{k.toUpperCase()}</option>)}
+                </select>
+                <div className="flex gap-2">
+                  <input type="number" placeholder="Parches" className="w-1/2 p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm border border-slate-100" value={newJersey.parches} onChange={e => setNewJersey({...newJersey, parches: e.target.value})} />
+                  <button onClick={() => setNewJersey({...newJersey, dorsal: !newJersey.dorsal})} className={`w-1/2 rounded-2xl font-black text-[10px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-slate-50 text-slate-300'}`}>{newJersey.dorsal ? 'DORSAL ON' : 'SIN DORSAL'}</button>
                 </div>
-                <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4">
-                  <Input label="Referencia Guayo" value={newZapato.nombre} onChange={v => setNewZapato({...newZapato, nombre: v})} />
-                  <div className="grid grid-cols-2 gap-3">
-                    <Input label="Costo (USD)" type="number" value={newZapato.costoUSD} onChange={v => setNewZapato({...newZapato, costoUSD: v})} />
-                    <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({...newZapato, margen: v})} />
-                  </div>
-                  <Input label="Cantidad pares" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({...newZapato, cantidad: v})} />
-                  <button onClick={agregarZapato} className="w-full bg-emerald-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg hover:bg-emerald-600 transition-colors">Añadir Guayos</button>
-                </div>
+                <button onClick={agregarJersey} className="w-full bg-indigo-500 text-white p-4 rounded-2xl font-black text-xs shadow-lg shadow-indigo-100 active:scale-95 transition-transform">AÑADIR A LISTA</button>
               </div>
-            ) : (
-              <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4 border-b-4 border-indigo-500">
-                <Input label="Referencia" value={newJersey.nombre} onChange={v => setNewJersey({...newJersey, nombre: v})} />
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase">Versión</label>
-                  <select className="bg-slate-50 rounded-xl p-3 text-sm font-bold border border-slate-200 outline-none" value={newJersey.tipo} onChange={e => setNewJersey({...newJersey, tipo: e.target.value})}>
-                    {Object.keys(COSTOS_BASE_JERSEY).map(k => <option key={k} value={k}>{k.toUpperCase()}</option>)}
+            )}
+
+            {modo === 'zapatos' && (
+              <div className="bg-white p-6 rounded-[2.5rem] border-b-8 border-emerald-500 shadow-xl space-y-4">
+                <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] text-center">Cotizador Guayos</p>
+                <input type="number" placeholder="TOTAL PARES CAJA" className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm border border-slate-100" onChange={e => setCajaZapatos({cantidadTotalCaja: e.target.value})} />
+                <input type="text" placeholder="MODELO / COLOR" className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm border border-slate-100" value={newZapato.nombre} onChange={e => setNewZapato({...newZapato, nombre: e.target.value.toUpperCase()})} />
+                <div className="flex gap-2">
+                  <input type="number" placeholder="USD COSTO" className="w-1/2 p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm border border-slate-100" value={newZapato.costoUSD} onChange={e => setNewZapato({...newZapato, costoUSD: e.target.value})} />
+                  <input type="number" placeholder="MARGEN %" className="w-1/2 p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm border border-slate-100" value={newZapato.margen} onChange={e => setNewZapato({...newZapato, margen: e.target.value})} />
+                </div>
+                <button onClick={agregarZapato} className="w-full bg-emerald-500 text-white p-4 rounded-2xl font-black text-xs shadow-lg shadow-emerald-100 active:scale-95 transition-transform">AÑADIR A LISTA</button>
+              </div>
+            )}
+          </div>
+
+          {/* COLUMNA PRINCIPAL */}
+          <div className="lg:col-span-8">
+            
+            {/* VISTA: STOCK (COLORES SLATE/CARBON) */}
+            {modo === 'stock' && (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div className="md:col-span-5 bg-white p-6 rounded-[2.5rem] shadow-sm border-b-8 border-slate-800 space-y-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Registro de Inventario</p>
+                  <input type="text" id="sk-nom" placeholder="Producto (Ej: Jersey L)" className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm" />
+                  <select id="sk-tipo" className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm">
+                    <option value="jersey">Jersey</option>
+                    <option value="guayo">Guayo</option>
                   </select>
+                  <button onClick={() => {
+                    const n = document.getElementById('sk-nom').value;
+                    const t = document.getElementById('sk-tipo').value;
+                    if(n) { setStock([{id: Date.now(), nombre: n.toUpperCase(), tipo: t}, ...stock]); document.getElementById('sk-nom').value = ''; }
+                  }} className="w-full bg-slate-800 text-white p-4 rounded-2xl font-black text-xs shadow-lg shadow-slate-200 uppercase">Guardar en Bodega</button>
                 </div>
-                <div className="grid grid-cols-2 gap-3 items-end">
-                  <Input label="Parches" type="number" value={newJersey.parches} onChange={v => setNewJersey({...newJersey, parches: v})} />
-                  <button onClick={() => setNewJersey({...newJersey, dorsal: !newJersey.dorsal})} className={`p-3 rounded-xl border text-[9px] font-black h-[46px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 text-white' : 'bg-white text-slate-400'}`}>
-                    {newJersey.dorsal ? 'DORSAL' : 'NO DORSAL'}
-                  </button>
+                <div className="md:col-span-7 grid grid-cols-1 gap-3">
+                  {stock.map(s => (
+                    <div key={s.id} className="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex justify-between items-center group">
+                      <div>
+                        <span className="text-[7px] font-black bg-slate-100 px-2 py-0.5 rounded text-slate-500 uppercase italic tracking-widest">{s.tipo}</span>
+                        <p className="font-black text-slate-700 uppercase text-sm mt-1">{s.nombre}</p>
+                      </div>
+                      <button onClick={() => setStock(stock.filter(i => i.id !== s.id))} className="bg-slate-50 text-slate-400 px-4 py-2 rounded-xl text-[10px] font-black hover:bg-emerald-500 hover:text-white transition-all uppercase">Vendido</button>
+                    </div>
+                  ))}
                 </div>
-                <Input label="Unidades" type="number" value={newJersey.cantidad} onChange={v => setNewJersey({...newJersey, cantidad: v})} />
-                <button onClick={agregarJersey} className="w-full bg-indigo-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg">Añadir Jersey</button>
               </div>
             )}
-          </aside>
 
-          {/* TABLA Y HISTORIAL */}
-          <main className="lg:col-span-8 space-y-6">
-            <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-100 overflow-x-auto">
-              <table className="w-full text-left min-w-[500px]">
-                <thead className="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  <tr>
-                    <th className="p-4 md:p-5">Producto</th>
-                    <th className="p-4 md:p-5 text-center text-emerald-500">Ganancia</th>
-                    <th className="p-4 md:p-5"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {items.map(item => {
-                    const { ganancia } = calcularValores(item, tasaCOP);
-                    return (
-                      <tr key={item.id}>
-                        <td className="p-4 md:p-5">
-                          <p className="font-bold text-slate-800 text-xs md:text-sm">{item.nombre}</p>
-                          <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase italic">
-                            {item.tipoItem === 'zapato' ? `Guayo (+ $${item.costoLogisticaUSD.toFixed(2)})` : `${item.tipo.toUpperCase()}`}
-                          </p>
-                        </td>
-                        <td className="p-4 md:p-5 text-center font-black text-emerald-500 text-xs md:text-sm">+{fmt(ganancia)}</td>
-                        <td className="p-4 md:p-5 text-right"><button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="text-slate-300 hover:text-red-500">✕</button></td>
+            {/* VISTA: DEUDAS (COLORES RED/ROSE) */}
+            {modo === 'deudas' && (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div className="md:col-span-5 bg-white p-6 rounded-[2.5rem] shadow-sm border-b-8 border-red-500 space-y-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Nuevo Pendiente</p>
+                  <input type="text" id="d-cli" placeholder="Nombre Cliente" className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm" />
+                  <input type="number" id="d-mon" placeholder="Monto total COP" className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-sm" />
+                  <input type="text" id="d-con" placeholder="¿Qué se llevó?" className="w-full p-4 bg-slate-50 rounded-2xl outline-none text-[10px] italic" />
+                  <button onClick={() => {
+                    const c = document.getElementById('d-cli').value;
+                    const m = document.getElementById('d-mon').value;
+                    const o = document.getElementById('d-con').value;
+                    if(c && m) { setDeudas([{id: Date.now(), cliente: c, monto: m, concepto: o}, ...deudas]); document.getElementById('d-cli').value = ''; document.getElementById('d-mon').value = ''; document.getElementById('d-con').value = ''; }
+                  }} className="w-full bg-red-500 text-white p-4 rounded-2xl font-black text-xs shadow-lg shadow-red-100 uppercase">Registrar Saldo</button>
+                </div>
+                <div className="md:col-span-7 grid grid-cols-1 gap-3">
+                  {deudas.map(d => (
+                    <div key={d.id} className="bg-white p-6 rounded-[1.5rem] shadow-sm border border-red-50 flex justify-between items-center relative overflow-hidden group">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-400"></div>
+                      <div>
+                        <p className="text-[9px] font-black text-red-500 uppercase tracking-tighter">{d.cliente}</p>
+                        <p className="text-2xl font-black text-slate-800 tracking-tighter">{fmt(d.monto)}</p>
+                        <p className="text-[10px] font-bold text-slate-300 italic">{d.concepto}</p>
+                      </div>
+                      <button onClick={() => setDeudas(deudas.filter(i => i.id !== d.id))} className="text-red-100 hover:text-red-500 transition-colors text-2xl font-bold">✕</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TABLA COTIZACIÓN */}
+            {(modo === 'camisetas' || modo === 'zapatos') && (
+              <div className="space-y-4">
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-slate-50/50">
+                      <tr className="text-[10px] font-black text-slate-400 uppercase italic">
+                        <th className="p-6 text-left">Producto</th>
+                        <th className="p-6 text-center">Venta Sugerida</th>
+                        <th className="p-6 text-right">Ganancia</th>
+                        <th className="p-6"></th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {items.length > 0 && (
-              <div className="bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl border-b-4 border-emerald-500">
-                <div className="text-center md:text-left">
-                  <p className="text-slate-400 text-[9px] md:text-[10px] font-black uppercase mb-1">Ganancia Total Lote</p>
-                  <h2 className="text-3xl md:text-4xl font-black text-emerald-400">{fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}</h2>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {items.map(item => {
+                        const res = calcular(item);
+                        return (
+                          <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="p-6">
+                              <p className="font-black text-slate-800 text-sm">{item.nombre}</p>
+                              <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{item.tipoItem}</p>
+                            </td>
+                            <td className="p-6 text-center">
+                              <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full font-black text-[11px] border border-blue-100">{fmt(res.venta)}</span>
+                            </td>
+                            <td className="p-6 text-right font-black text-emerald-500 text-sm">{fmt(res.ganancia)}</td>
+                            <td className="p-6 text-right">
+                              <button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="text-slate-200 hover:text-red-400 transition-colors">✕</button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
-                <button onClick={() => {
-                  const finalItems = items.map(i => ({...i, ...calcularValores(i, tasaCOP)}));
-                  const totalG = finalItems.reduce((acc, i) => acc + i.ganancia, 0);
-                  setHistorial([{id: Date.now(), fecha: new Date().toLocaleString(), ganancia: totalG, und: items.length, tipo: modo, productos: finalItems, trm: tasaCOP}, ...historial]);
-                  setItems([]);
-                }} className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-8 py-4 rounded-xl md:rounded-2xl font-black text-[10px] uppercase shadow-lg">Guardar Registro</button>
+                {items.length > 0 && (
+                  <div className="bg-slate-900 p-8 rounded-[3rem] text-white flex justify-between items-center shadow-2xl">
+                    <div>
+                      <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Ganancia Estimada</p>
+                      <h2 className="text-4xl font-black text-emerald-400 tracking-tighter">{fmt(items.reduce((acc, i) => acc + calcular(i).ganancia, 0))}</h2>
+                    </div>
+                    <button onClick={() => {
+                      const totalG = items.reduce((acc, i) => acc + calcular(i).ganancia, 0);
+                      setHistorial([{id: Date.now(), fecha: new Date().toLocaleString(), ganancia: totalG}, ...historial]);
+                      setItems([]);
+                    }} className="bg-emerald-500 hover:bg-emerald-400 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Limpiar y Guardar</button>
+                  </div>
+                )}
               </div>
             )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
-              {historial.map(h => (
-                <div key={h.id} className="bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
-                  <div className="cursor-pointer flex-1" onClick={() => setLoteSeleccionado(h)}>
-                    <p className="text-[9px] md:text-[10px] font-black text-slate-700">{h.fecha}</p>
-                    <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase leading-tight">{h.tipo} • {h.und} Und • <span className="text-indigo-500 font-black italic">DETALLE</span></p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-xs md:text-sm font-black text-emerald-500">{fmt(h.ganancia)}</p>
-                    <button onClick={() => setHistorial(historial.filter(item => item.id !== h.id))} className="text-slate-200 hover:text-red-500 p-2">✕</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </main>
+          </div>
         </div>
       </div>
-
-      {/* MODAL RESPONSIVE */}
-      {loteSeleccionado && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-          <div className="bg-white w-full max-w-2xl rounded-t-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in slide-in-from-bottom duration-300">
-            <div className="p-6 md:p-8 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-              <div>
-                <h3 className="text-lg md:text-xl font-black uppercase italic text-slate-800 leading-tight">Detalle del Lote</h3>
-                <p className="text-[10px] font-bold text-slate-400">{loteSeleccionado.fecha}</p>
-              </div>
-              <button onClick={() => setLoteSeleccionado(null)} className="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center font-black text-slate-400 text-sm">✕</button>
-            </div>
-            
-            <div className="overflow-x-auto flex-1">
-              <table className="w-full min-w-[450px]">
-                <thead className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase border-b border-slate-50 bg-slate-50/50">
-                  <tr>
-                    <th className="p-4 text-left">Producto</th>
-                    <th className="p-4 text-center">Costo Un.</th>
-                    <th className="p-4 text-center">Venta Un.</th>
-                    <th className="p-4 text-right">Ganancia</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {loteSeleccionado.productos.map((p, idx) => (
-                    <tr key={idx} className="text-[11px] md:text-xs">
-                      <td className="p-4">
-                        <span className="font-bold text-slate-700 block">{p.nombre}</span>
-                        <span className="text-[8px] text-slate-400 uppercase italic leading-none">{p.tipoItem === 'zapato' ? 'Guayo' : p.tipo}</span>
-                      </td>
-                      <td className="p-4 text-center font-medium text-slate-500">{fmt(p.costoCOP)}</td>
-                      <td className="p-4 text-center font-black text-indigo-500">{fmt(p.venta)}</td>
-                      <td className="p-4 text-right font-black text-emerald-500">{fmt(p.ganancia)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="p-6 md:p-8 bg-emerald-500 text-white flex justify-between items-center">
-               <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Total Ganancia</span>
-               <span className="text-xl md:text-2xl font-black">{fmt(loteSeleccionado.ganancia)}</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
-
-const Input = ({ label, onChange, ...p }) => (
-  <div className="flex flex-col gap-1 w-full">
-    <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">{label}</label>
-    <input {...p} onChange={e => onChange(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-bold text-slate-700 text-sm focus:border-indigo-500" />
-  </div>
-);
-
-const InputDark = ({ label, onChange, ...p }) => (
-  <div className="flex flex-col gap-1 w-full">
-    <label className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase mb-1">{label}</label>
-    <input {...p} onChange={e => onChange(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 outline-none font-bold text-white text-sm focus:border-emerald-400" />
-  </div>
-);
 
 export default App;
