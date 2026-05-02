@@ -119,10 +119,10 @@ const App = () => {
         <header className="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6 bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-white">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
-              <span className="text-white font-black text-xl">G</span>
+              <span className="text-white font-black text-xl"></span>
             </div>
             <div>
-              <h1 className="text-2xl font-black italic uppercase tracking-tighter">Gol93<span className="text-emerald-500">Store</span></h1>
+              <h1 className="text-2xl font-black italic uppercase tracking-tighter">ORBITA<span className="text-emerald-500">90</span></h1>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Panel de Importación v2.0</p>
             </div>
           </div>
