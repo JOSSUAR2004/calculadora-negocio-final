@@ -541,14 +541,14 @@ const App = () => {
             {modo === 'deudas' && (
               <div className="space-y-6 animate-in fade-in duration-300">
                 {/* Banner Total Deudas */}
-                <div className="bg-red-500 p-8 rounded-[2.5rem] text-white shadow-xl shadow-red-100 border-b-[6px] border-red-700 flex justify-between items-center">
+                <div className="bg-indigo-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-indigo-100 border-b-[6px] border-indigo-800 flex justify-between items-center">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Total por Cobrar</p>
                     <h2 className="text-4xl font-black tracking-tighter">
                       {fmt(deudas.reduce((acc, d) => acc + d.monto, 0))}
                     </h2>
                   </div>
-                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl">💸</div>
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl">$</div>
                 </div>
 
                 <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
