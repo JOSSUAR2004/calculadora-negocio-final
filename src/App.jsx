@@ -137,43 +137,7 @@ const App = () => {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          {/* FORMULARIOS */}
-          <aside className="lg:col-span-4 space-y-4 md:space-y-6">
-            {modo === 'zapatos' ? (
-              <div className="space-y-4">
-                <div className="bg-slate-900 p-5 md:p-6 rounded-2xl md:rounded-3xl text-white border-b-4 border-emerald-500 shadow-xl">
-                  <InputDark label="Pares totales caja" type="number" value={cajaZapatos.cantidadTotalCaja} onChange={v => setCajaZapatos({ cantidadTotalCaja: v })} />
-                </div>
-                <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4">
-                  <Input label="Referencia Guayo" value={newZapato.nombre} onChange={v => setNewZapato({ ...newZapato, nombre: v })} />
-                  <div className="grid grid-cols-2 gap-3">
-                    <Input label="Costo (USD)" type="number" value={newZapato.costoUSD} onChange={v => setNewZapato({ ...newZapato, costoUSD: v })} />
-                    <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({ ...newZapato, margen: v })} />
-                  </div>
-                  <Input label="Cantidad pares" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({ ...newZapato, cantidad: v })} />
-                  <button onClick={agregarZapato} className="w-full bg-emerald-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg hover:bg-emerald-600 transition-colors">Añadir Guayos</button>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4 border-b-4 border-indigo-500">
-                <Input label="Referencia" value={newJersey.nombre} onChange={v => setNewJersey({ ...newJersey, nombre: v })} />
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase">Versión</label>
-                  <select className="bg-slate-50 rounded-xl p-3 text-sm font-bold border border-slate-200 outline-none" value={newJersey.tipo} onChange={e => setNewJersey({ ...newJersey, tipo: e.target.value })}>
-                    {Object.keys(COSTOS_BASE_JERSEY).map(k => <option key={k} value={k}>{k.toUpperCase()}</option>)}
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-3 items-end">
-                  <Input label="Parches" type="number" value={newJersey.parches} onChange={v => setNewJersey({ ...newJersey, parches: v })} />
-                  <button onClick={() => setNewJersey({ ...newJersey, dorsal: !newJersey.dorsal })} className={`p-3 rounded-xl border text-[9px] font-black h-[46px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 text-white' : 'bg-white text-slate-400'}`}>
-                    {newJersey.dorsal ? 'DORSAL' : 'NO DORSAL'}
-                  </button>
-                </div>
-                <Input label="Unidades" type="number" value={newJersey.cantidad} onChange={v => setNewJersey({ ...newJersey, cantidad: v })} />
-                <button onClick={agregarJersey} className="w-full bg-indigo-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg">Añadir Jersey</button>
-              </div>
-            )}
-          </aside>
+
 
           {/* TABLA Y HISTORIAL */}
           <main className="lg:col-span-8 space-y-6">
@@ -286,6 +250,45 @@ const App = () => {
             {/* 3. SECCIÓN COTIZACIÓN + HISTORIAL: Solo visibles en Camisetas o Zapatos */}
             {(modo === 'camisetas' || modo === 'zapatos') && (
               <div className="space-y-6 animate-in fade-in duration-500">
+
+                {/* FORMULARIOS */}
+                <aside className="lg:col-span-4 space-y-4 md:space-y-6">
+                  {modo === 'zapatos' ? (
+                    <div className="space-y-4">
+                      <div className="bg-slate-900 p-5 md:p-6 rounded-2xl md:rounded-3xl text-white border-b-4 border-emerald-500 shadow-xl">
+                        <InputDark label="Pares totales caja" type="number" value={cajaZapatos.cantidadTotalCaja} onChange={v => setCajaZapatos({ cantidadTotalCaja: v })} />
+                      </div>
+                      <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4">
+                        <Input label="Referencia Guayo" value={newZapato.nombre} onChange={v => setNewZapato({ ...newZapato, nombre: v })} />
+                        <div className="grid grid-cols-2 gap-3">
+                          <Input label="Costo (USD)" type="number" value={newZapato.costoUSD} onChange={v => setNewZapato({ ...newZapato, costoUSD: v })} />
+                          <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({ ...newZapato, margen: v })} />
+                        </div>
+                        <Input label="Cantidad pares" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({ ...newZapato, cantidad: v })} />
+                        <button onClick={agregarZapato} className="w-full bg-emerald-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg hover:bg-emerald-600 transition-colors">Añadir Guayos</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4 border-b-4 border-indigo-500">
+                      <Input label="Referencia" value={newJersey.nombre} onChange={v => setNewJersey({ ...newJersey, nombre: v })} />
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase">Versión</label>
+                        <select className="bg-slate-50 rounded-xl p-3 text-sm font-bold border border-slate-200 outline-none" value={newJersey.tipo} onChange={e => setNewJersey({ ...newJersey, tipo: e.target.value })}>
+                          {Object.keys(COSTOS_BASE_JERSEY).map(k => <option key={k} value={k}>{k.toUpperCase()}</option>)}
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 items-end">
+                        <Input label="Parches" type="number" value={newJersey.parches} onChange={v => setNewJersey({ ...newJersey, parches: v })} />
+                        <button onClick={() => setNewJersey({ ...newJersey, dorsal: !newJersey.dorsal })} className={`p-3 rounded-xl border text-[9px] font-black h-[46px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 text-white' : 'bg-white text-slate-400'}`}>
+                          {newJersey.dorsal ? 'DORSAL' : 'NO DORSAL'}
+                        </button>
+                      </div>
+                      <Input label="Unidades" type="number" value={newJersey.cantidad} onChange={v => setNewJersey({ ...newJersey, cantidad: v })} />
+                      <button onClick={agregarJersey} className="w-full bg-indigo-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg">Añadir Jersey</button>
+                    </div>
+                  )}
+                </aside>
+
 
                 {/* Contenedor de la Tabla */}
                 <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
