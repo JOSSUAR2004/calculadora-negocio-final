@@ -1,265 +1,225 @@
 import React, { useState, useEffect } from 'react';
 
 const App = () => {
-  const [tasaCOP, setTasaCOP] = useState(() => JSON.parse(localStorage.getItem('g93_tasa')) || 3600);
-  const [modo, setModo] = useState('camisetas'); 
-  const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('g93_items')) || []);
-  const [historial, setHistorial] = useState(() => JSON.parse(localStorage.getItem('g93_historial')) || []);
-  const [loteSeleccionado, setLoteSeleccionado] = useState(null);
+  // --- ESTADOS GLOBALES Y PERSISTENCIA ---
+  const [seccion, setSeccion] = useState('calculadora');
+  const [tasaCOP, setTasaCOP] = useState(() => JSON.parse(localStorage.getItem('o90_tasa')) || 4000);
+  const [itemsCalculadora, setItemsCalculadora] = useState([]);
+  const [stock, setStock] = useState(() => JSON.parse(localStorage.getItem('o90_stock')) || []);
+  const [deudas, setDeudas] = useState(() => JSON.parse(localStorage.getItem('o90_deudas')) || []);
 
   useEffect(() => {
-    localStorage.setItem('g93_tasa', JSON.stringify(tasaCOP));
-    localStorage.setItem('g93_items', JSON.stringify(items));
-    localStorage.setItem('g93_historial', JSON.stringify(historial));
-  }, [tasaCOP, items, historial]);
+    localStorage.setItem('o90_tasa', JSON.stringify(tasaCOP));
+    localStorage.setItem('o90_stock', JSON.stringify(stock));
+    localStorage.setItem('o90_deudas', JSON.stringify(deudas));
+  }, [tasaCOP, stock, deudas]);
 
-  const COSTO_LIBRA = 3.10; 
+  // --- LÓGICA CALCULADORA ---
+  const COSTO_LIBRA = 3.10;
   const ENVIO_CHINA_USA = 10;
   const CARGOS_FIJOS = 7;
-  const PESO_PAR_LB = 1.32; 
+  const PESO_PAR_LB = 1.32;
 
-  const COSTOS_BASE_JERSEY = {
-    fan: 13, player: 16, retro: 17, longSleeve: 17, children: 15, nba: 23, f1_nfl: 25
+  const [newZapato, setNewZapato] = useState({ nombre: '', costoUSD: '', margen: 30 });
+
+  const agregarZapatoCalculadora = () => {
+    if (!newZapato.nombre || !newZapato.costoUSD) return;
+    const logistica = (ENVIO_CHINA_USA + CARGOS_FIJOS + (1 * PESO_PAR_LB * COSTO_LIBRA));
+    const costoTotalUSD = parseFloat(newZapato.costoUSD) + logistica;
+    const costoCOP = costoTotalUSD * tasaCOP;
+    const venta = costoCOP / (1 - (newZapato.margen / 100));
+
+    setItemsCalculadora([...itemsCalculadora, { ...newZapato, id: Date.now(), costoCOP, venta, ganancia: venta - costoCOP }]);
+    setNewZapato({ nombre: '', costoUSD: '', margen: 30 });
   };
 
-  const PRECIOS_VENTA_JERSEY = {
-    fan: 125000, player: 140000, retro: 150000, longSleeve: 155000, children: 110000, nba: 180000, f1_nfl: 195000
-  };
+  // --- LÓGICA STOCK (CON EDICIÓN) ---
+  const [newStock, setNewStock] = useState({ referencia: '', talla: 'M', tipo: 'FAN', cantidad: 1 });
+  const [editandoStockId, setEditandoStockId] = useState(null);
 
-  const [cajaZapatos, setCajaZapatos] = useState({ cantidadTotalCaja: 1 });
-  const [newZapato, setNewZapato] = useState({ nombre: '', costoUSD: '', margen: 20, cantidad: 1 });
-  const [newJersey, setNewJersey] = useState({ nombre: '', tipo: 'player', parches: 0, dorsal: false, cantidad: 1 });
-
-  const agregarZapato = () => {
-    if (!newZapato.nombre || !newZapato.costoUSD) return alert("Completa los datos");
-    const nTotalCaja = parseInt(cajaZapatos.cantidadTotalCaja) || 1;
-    const pesoCajaTotal = nTotalCaja * PESO_PAR_LB;
-    const logisticaPorParUSD = (ENVIO_CHINA_USA + CARGOS_FIJOS + (pesoCajaTotal * COSTO_LIBRA)) / nTotalCaja;
-
-    const nuevos = Array.from({ length: parseInt(newZapato.cantidad) || 1 }, (_, i) => ({
-      ...newZapato,
-      id: Date.now() + Math.random(),
-      costoLogisticaUSD: logisticaPorParUSD,
-      tipoItem: 'zapato',
-      trmRegistro: tasaCOP
-    }));
-    setItems([...items, ...nuevos]);
-    setNewZapato({ ...newZapato, nombre: '', costoUSD: '', margen: 30, cantidad: 1 });
-  };
-
-  const agregarJersey = () => {
-    if (!newJersey.nombre) return alert("Escribe el nombre del equipo");
-    const nuevos = Array.from({ length: parseInt(newJersey.cantidad) || 1 }, (_, i) => ({
-      ...newJersey,
-      id: Date.now() + Math.random(),
-      costoBaseUSD: COSTOS_BASE_JERSEY[newJersey.tipo],
-      tipoItem: 'camiseta',
-      trmRegistro: tasaCOP
-    }));
-    setItems([...items, ...nuevos]);
-    setNewJersey({ ...newJersey, nombre: '', parches: 0, dorsal: false, cantidad: 1 });
-  };
-
-  const calcularValores = (item, trm) => {
-    if (item.tipoItem === 'zapato') {
-      const costoTotalUSD = parseFloat(item.costoUSD) + item.costoLogisticaUSD;
-      const costoCOP = costoTotalUSD * trm;
-      const venta = costoCOP / (1 - (item.margen / 100));
-      return { costoCOP, venta, ganancia: venta - costoCOP };
+  const guardarStock = () => {
+    if (!newStock.referencia) return alert("Escribe la referencia");
+    if (editandoStockId) {
+      setStock(stock.map(item => item.id === editandoStockId ? { ...newStock, id: editandoStockId } : item));
+      setEditandoStockId(null);
     } else {
-      const costoExtrasUSD = (item.dorsal ? 1 : 0) + (parseInt(item.parches) || 0);
-      const costoTotalUSD = item.costoBaseUSD + costoExtrasUSD;
-      const costoCOP = costoTotalUSD * trm;
-      const venta = PRECIOS_VENTA_JERSEY[item.tipo];
-      return { costoCOP, venta, ganancia: venta - costoCOP };
+      setStock([...stock, { ...newStock, id: Date.now() }]);
     }
+    setNewStock({ referencia: '', talla: 'M', tipo: 'FAN', cantidad: 1 });
+  };
+
+  const prepararEdicionStock = (item) => {
+    setNewStock({ ...item });
+    setEditandoStockId(item.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // --- LÓGICA DEUDAS ---
+  const [newDeuda, setNewDeuda] = useState({ cliente: '', monto: '', concepto: '' });
+  const agregarDeuda = () => {
+    if (!newDeuda.cliente || !newDeuda.monto) return;
+    setDeudas([...deudas, { ...newDeuda, id: Date.now(), pagado: false, fecha: new Date().toLocaleDateString() }]);
+    setNewDeuda({ cliente: '', monto: '', concepto: '' });
   };
 
   const fmt = (v) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(v);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-3 md:p-8 font-sans">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-10">
+      {/* HEADER NAVBAR */}
+      <header className="bg-white border-b border-slate-200 p-4 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <h1 className="text-2xl font-black italic">ORBITA<span className="text-orange-500">90</span></h1>
+          <nav className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
+            {['calculadora', 'stock', 'deudas'].map((tab) => (
+              <button 
+                key={tab}
+                onClick={() => setSeccion(tab)} 
+                className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-[10px] font-black transition-all uppercase ${seccion === tab ? 'bg-white shadow text-orange-600' : 'text-slate-400'}`}
+              >
+                {tab}
+              </button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-lg border border-orange-100">
+            <span className="text-[9px] font-black text-orange-600 uppercase">TRM</span>
+            <input type="number" value={tasaCOP} onChange={(e) => setTasaCOP(e.target.value)} className="bg-transparent font-bold text-sm w-16 outline-none text-orange-700" />
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-5xl mx-auto p-4 md:p-8">
         
-        {/* HEADER RESPONSIVE */}
-        <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100">
-          <h1 className="text-xl md:text-2xl font-black italic uppercase text-slate-800">Gol93<span className="text-emerald-500">Store</span></h1>
-          
-          <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
-            <button onClick={() => {setModo('camisetas'); setItems([])}} className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[10px] md:text-xs transition-all ${modo === 'camisetas' ? 'bg-white shadow text-indigo-600' : 'text-slate-400'}`}>👕 JERSEY</button>
-            <button onClick={() => {setModo('zapatos'); setItems([])}} className={`flex-1 md:flex-none px-4 md:px-6 py-2 rounded-lg font-black text-[10px] md:text-xs transition-all ${modo === 'zapatos' ? 'bg-white shadow text-emerald-600' : 'text-slate-400'}`}>👟 GUAYOS</button>
-          </div>
-
-          <div className="bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto">
-            <span className="text-[9px] font-black text-emerald-600 uppercase mr-2 md:mr-0">TRM Actual</span>
-            <input type="number" value={tasaCOP} onChange={(e) => setTasaCOP(parseFloat(e.target.value) || 0)} className="bg-transparent border-none outline-none text-lg font-black text-emerald-800 w-20 md:w-24 text-right" />
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          {/* FORMULARIOS */}
-          <aside className="lg:col-span-4 space-y-4 md:space-y-6">
-            {modo === 'zapatos' ? (
-              <div className="space-y-4">
-                <div className="bg-slate-900 p-5 md:p-6 rounded-2xl md:rounded-3xl text-white border-b-4 border-emerald-500 shadow-xl">
-                  <InputDark label="Pares totales caja" type="number" value={cajaZapatos.cantidadTotalCaja} onChange={v => setCajaZapatos({cantidadTotalCaja: v})} />
-                </div>
-                <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4">
-                  <Input label="Referencia Guayo" value={newZapato.nombre} onChange={v => setNewZapato({...newZapato, nombre: v})} />
-                  <div className="grid grid-cols-2 gap-3">
-                    <Input label="Costo (USD)" type="number" value={newZapato.costoUSD} onChange={v => setNewZapato({...newZapato, costoUSD: v})} />
-                    <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({...newZapato, margen: v})} />
-                  </div>
-                  <Input label="Cantidad pares" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({...newZapato, cantidad: v})} />
-                  <button onClick={agregarZapato} className="w-full bg-emerald-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg hover:bg-emerald-600 transition-colors">Añadir Guayos</button>
-                </div>
+        {/* SECCIÓN CALCULADORA */}
+        {seccion === 'calculadora' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+              <h2 className="text-sm font-black mb-4 uppercase text-slate-700 underline decoration-orange-400">Simulador de Importación</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input placeholder="Referencia Guayo" className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-sm font-bold" value={newZapato.nombre} onChange={e => setNewZapato({...newZapato, nombre: e.target.value.toUpperCase()})} />
+                <input type="number" placeholder="Costo USD" className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-sm font-bold" value={newZapato.costoUSD} onChange={e => setNewZapato({...newZapato, costoUSD: e.target.value})} />
+                <button onClick={agregarZapatoCalculadora} className="bg-slate-900 text-white font-black rounded-xl text-xs uppercase hover:bg-orange-500 transition-all">Calcular</button>
               </div>
-            ) : (
-              <div className="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] shadow-xl border border-slate-100 space-y-4 border-b-4 border-indigo-500">
-                <Input label="Referencia" value={newJersey.nombre} onChange={v => setNewJersey({...newJersey, nombre: v})} />
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase">Versión</label>
-                  <select className="bg-slate-50 rounded-xl p-3 text-sm font-bold border border-slate-200 outline-none" value={newJersey.tipo} onChange={e => setNewJersey({...newJersey, tipo: e.target.value})}>
-                    {Object.keys(COSTOS_BASE_JERSEY).map(k => <option key={k} value={k}>{k.toUpperCase()}</option>)}
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-3 items-end">
-                  <Input label="Parches" type="number" value={newJersey.parches} onChange={v => setNewJersey({...newJersey, parches: v})} />
-                  <button onClick={() => setNewJersey({...newJersey, dorsal: !newJersey.dorsal})} className={`p-3 rounded-xl border text-[9px] font-black h-[46px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 text-white' : 'bg-white text-slate-400'}`}>
-                    {newJersey.dorsal ? 'DORSAL' : 'NO DORSAL'}
-                  </button>
-                </div>
-                <Input label="Unidades" type="number" value={newJersey.cantidad} onChange={v => setNewJersey({...newJersey, cantidad: v})} />
-                <button onClick={agregarJersey} className="w-full bg-indigo-500 text-white p-4 rounded-xl font-black text-xs uppercase shadow-lg">Añadir Jersey</button>
-              </div>
-            )}
-          </aside>
-
-          {/* TABLA Y HISTORIAL */}
-          <main className="lg:col-span-8 space-y-6">
-            <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-100 overflow-x-auto">
-              <table className="w-full text-left min-w-[500px]">
-                <thead className="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  <tr>
-                    <th className="p-4 md:p-5">Producto</th>
-                    <th className="p-4 md:p-5 text-center text-emerald-500">Ganancia</th>
-                    <th className="p-4 md:p-5"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {items.map(item => {
-                    const { ganancia } = calcularValores(item, tasaCOP);
-                    return (
-                      <tr key={item.id}>
-                        <td className="p-4 md:p-5">
-                          <p className="font-bold text-slate-800 text-xs md:text-sm">{item.nombre}</p>
-                          <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase italic">
-                            {item.tipoItem === 'zapato' ? `Guayo (+ $${item.costoLogisticaUSD.toFixed(2)})` : `${item.tipo.toUpperCase()}`}
-                          </p>
-                        </td>
-                        <td className="p-4 md:p-5 text-center font-black text-emerald-500 text-xs md:text-sm">+{fmt(ganancia)}</td>
-                        <td className="p-4 md:p-5 text-right"><button onClick={() => setItems(items.filter(i => i.id !== item.id))} className="text-slate-300 hover:text-red-500">✕</button></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
             </div>
-
-            {items.length > 0 && (
-              <div className="bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] text-white flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl border-b-4 border-emerald-500">
-                <div className="text-center md:text-left">
-                  <p className="text-slate-400 text-[9px] md:text-[10px] font-black uppercase mb-1">Ganancia Total Lote</p>
-                  <h2 className="text-3xl md:text-4xl font-black text-emerald-400">{fmt(items.reduce((acc, i) => acc + calcularValores(i, tasaCOP).ganancia, 0))}</h2>
-                </div>
-                <button onClick={() => {
-                  const finalItems = items.map(i => ({...i, ...calcularValores(i, tasaCOP)}));
-                  const totalG = finalItems.reduce((acc, i) => acc + i.ganancia, 0);
-                  setHistorial([{id: Date.now(), fecha: new Date().toLocaleString(), ganancia: totalG, und: items.length, tipo: modo, productos: finalItems, trm: tasaCOP}, ...historial]);
-                  setItems([]);
-                }} className="w-full md:w-auto bg-emerald-500 hover:bg-emerald-600 px-8 py-4 rounded-xl md:rounded-2xl font-black text-[10px] uppercase shadow-lg">Guardar Registro</button>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
-              {historial.map(h => (
-                <div key={h.id} className="bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
-                  <div className="cursor-pointer flex-1" onClick={() => setLoteSeleccionado(h)}>
-                    <p className="text-[9px] md:text-[10px] font-black text-slate-700">{h.fecha}</p>
-                    <p className="text-[8px] md:text-[9px] font-bold text-slate-400 mt-1 uppercase leading-tight">{h.tipo} • {h.und} Und • <span className="text-indigo-500 font-black italic">DETALLE</span></p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-xs md:text-sm font-black text-emerald-500">{fmt(h.ganancia)}</p>
-                    <button onClick={() => setHistorial(historial.filter(item => item.id !== h.id))} className="text-slate-200 hover:text-red-500 p-2">✕</button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {itemsCalculadora.map(item => (
+                <div key={item.id} className="bg-white p-5 rounded-3xl border-l-4 border-l-orange-500 shadow-sm">
+                  <p className="font-black text-xs uppercase text-slate-500">{item.nombre}</p>
+                  <div className="flex justify-between items-end mt-2">
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-400">VENTA SUGERIDA</p>
+                      <p className="text-xl font-black text-slate-800">{fmt(item.venta)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold text-emerald-500">GANANCIA</p>
+                      <p className="text-sm font-black text-emerald-500">{fmt(item.ganancia)}</p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-          </main>
-        </div>
-      </div>
+          </div>
+        )}
 
-      {/* MODAL RESPONSIVE */}
-      {loteSeleccionado && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-          <div className="bg-white w-full max-w-2xl rounded-t-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in slide-in-from-bottom duration-300">
-            <div className="p-6 md:p-8 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-              <div>
-                <h3 className="text-lg md:text-xl font-black uppercase italic text-slate-800 leading-tight">Detalle del Lote</h3>
-                <p className="text-[10px] font-bold text-slate-400">{loteSeleccionado.fecha}</p>
+        {/* SECCIÓN STOCK */}
+        {seccion === 'stock' && (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <div className={`p-6 rounded-3xl shadow-lg border-2 transition-all ${editandoStockId ? 'border-orange-500 bg-orange-50' : 'border-transparent bg-white'}`}>
+              <h2 className="text-sm font-black mb-4 uppercase text-slate-700">{editandoStockId ? '📝 Editando Producto' : '🚀 Ingreso de Mercancía'}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                <input placeholder="Referencia" className="p-3 bg-white rounded-xl border border-slate-200 text-sm font-bold lg:col-span-2" value={newStock.referencia} onChange={e => setNewStock({...newStock, referencia: e.target.value.toUpperCase()})} />
+                <select className="p-3 bg-white rounded-xl border border-slate-200 text-sm font-bold" value={newStock.tipo} onChange={e => setNewStock({...newStock, tipo: e.target.value})}>
+                  <option>FAN</option><option>PLAYER</option><option>RETRO</option><option>KIDS</option>
+                </select>
+                <select className="p-3 bg-white rounded-xl border border-slate-200 text-sm font-bold" value={newStock.talla} onChange={e => setNewStock({...newStock, talla: e.target.value})}>
+                  <option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>24</option><option>26</option><option>28</option>
+                </select>
+                <div className="flex gap-2">
+                  <input type="number" className="p-3 bg-white rounded-xl border border-slate-200 text-sm font-bold w-full" value={newStock.cantidad} onChange={e => setNewStock({...newStock, cantidad: parseInt(e.target.value) || 0})} />
+                  <button onClick={guardarStock} className={`px-6 rounded-xl font-black text-[10px] uppercase ${editandoStockId ? 'bg-orange-600 text-white' : 'bg-slate-900 text-white'}`}>{editandoStockId ? 'OK' : 'Añadir'}</button>
+                </div>
               </div>
-              <button onClick={() => setLoteSeleccionado(null)} className="bg-white w-10 h-10 rounded-full shadow-sm flex items-center justify-center font-black text-slate-400 text-sm">✕</button>
             </div>
-            
-            <div className="overflow-x-auto flex-1">
-              <table className="w-full min-w-[450px]">
-                <thead className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase border-b border-slate-50 bg-slate-50/50">
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {stock.map(item => (
+                <div key={item.id} className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                  <div className="flex justify-between items-start mb-3">
+                    <span className={`text-[8px] font-black px-2 py-1 rounded-md ${item.tipo === 'PLAYER' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}`}>{item.tipo}</span>
+                    <div className="flex gap-2">
+                      <button onClick={() => prepararEdicionStock(item)} className="text-xs">✏️</button>
+                      <button onClick={() => setStock(stock.filter(i => i.id !== item.id))} className="text-xs">🗑️</button>
+                    </div>
+                  </div>
+                  <h3 className="font-black text-slate-800 text-xs uppercase">{item.referencia}</h3>
+                  <p className="text-[10px] font-bold text-slate-400 mb-4">TALLA {item.talla}</p>
+                  <div className="flex items-center justify-between bg-slate-50 p-2 rounded-2xl">
+                    <button onClick={() => setStock(stock.map(s => s.id === item.id ? {...s, cantidad: Math.max(0, s.cantidad - 1)} : s))} className="w-8 h-8 rounded-xl bg-white border font-bold">-</button>
+                    <span className="font-black text-sm">{item.cantidad} UND</span>
+                    <button onClick={() => setStock(stock.map(s => s.id === item.id ? {...s, cantidad: s.cantidad + 1} : s))} className="w-8 h-8 rounded-xl bg-slate-900 text-white font-bold">+</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SECCIÓN DEUDAS */}
+        {seccion === 'deudas' && (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="bg-slate-900 p-6 rounded-3xl shadow-xl text-white">
+              <h2 className="text-sm font-black mb-4 uppercase text-orange-400">Nueva Cuenta por Cobrar</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input placeholder="Cliente" className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-sm font-bold text-white outline-none" value={newDeuda.cliente} onChange={e => setNewDeuda({...newDeuda, cliente: e.target.value.toUpperCase()})} />
+                <input type="number" placeholder="Valor COP" className="p-3 bg-slate-800 rounded-xl border border-slate-700 text-sm font-bold text-white outline-none" value={newDeuda.monto} onChange={e => setNewDeuda({...newDeuda, monto: e.target.value})} />
+                <button onClick={agregarDeuda} className="bg-orange-500 text-white font-black rounded-xl text-[10px] uppercase">Registrar</button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase">
                   <tr>
-                    <th className="p-4 text-left">Producto</th>
-                    <th className="p-4 text-center">Costo Un.</th>
-                    <th className="p-4 text-center">Venta Un.</th>
-                    <th className="p-4 text-right">Ganancia</th>
+                    <th className="p-4">Cliente</th>
+                    <th className="p-4 text-right">Monto</th>
+                    <th className="p-4 text-center">Estado</th>
+                    <th className="p-4"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {loteSeleccionado.productos.map((p, idx) => (
-                    <tr key={idx} className="text-[11px] md:text-xs">
+                  {deudas.map(d => (
+                    <tr key={d.id} className={`text-xs ${d.pagado ? 'bg-emerald-50/30' : ''}`}>
                       <td className="p-4">
-                        <span className="font-bold text-slate-700 block">{p.nombre}</span>
-                        <span className="text-[8px] text-slate-400 uppercase italic leading-none">{p.tipoItem === 'zapato' ? 'Guayo' : p.tipo}</span>
+                        <p className="font-black text-slate-700 uppercase">{d.cliente}</p>
+                        <p className="text-[9px] text-slate-400">{d.fecha}</p>
                       </td>
-                      <td className="p-4 text-center font-medium text-slate-500">{fmt(p.costoCOP)}</td>
-                      <td className="p-4 text-center font-black text-indigo-500">{fmt(p.venta)}</td>
-                      <td className="p-4 text-right font-black text-emerald-500">{fmt(p.ganancia)}</td>
+                      <td className="p-4 text-right font-black">{fmt(d.monto)}</td>
+                      <td className="p-4 text-center">
+                        <button 
+                          onClick={() => setDeudas(deudas.map(item => item.id === d.id ? {...item, pagado: !item.pagado} : item))}
+                          className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${d.pagado ? 'bg-emerald-500 text-white' : 'bg-red-100 text-red-500 border border-red-200'}`}
+                        >
+                          {d.pagado ? 'PAGADO' : 'PENDIENTE'}
+                        </button>
+                      </td>
+                      <td className="p-4 text-right">
+                        <button onClick={() => setDeudas(deudas.filter(i => i.id !== d.id))} className="text-slate-300 hover:text-red-500">✕</button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
-
-            <div className="p-6 md:p-8 bg-emerald-500 text-white flex justify-between items-center">
-               <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Total Ganancia</span>
-               <span className="text-xl md:text-2xl font-black">{fmt(loteSeleccionado.ganancia)}</span>
+              <div className="bg-slate-900 p-4 flex justify-between items-center text-white">
+                <span className="text-[10px] font-black uppercase text-slate-400">Total por Cobrar</span>
+                <span className="text-xl font-black text-orange-400">{fmt(deudas.filter(d => !d.pagado).reduce((acc, curr) => acc + parseFloat(curr.monto || 0), 0))}</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+      </main>
     </div>
   );
 };
-
-const Input = ({ label, onChange, ...p }) => (
-  <div className="flex flex-col gap-1 w-full">
-    <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">{label}</label>
-    <input {...p} onChange={e => onChange(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-bold text-slate-700 text-sm focus:border-indigo-500" />
-  </div>
-);
-
-const InputDark = ({ label, onChange, ...p }) => (
-  <div className="flex flex-col gap-1 w-full">
-    <label className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase mb-1">{label}</label>
-    <input {...p} onChange={e => onChange(e.target.value)} className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 outline-none font-bold text-white text-sm focus:border-emerald-400" />
-  </div>
-);
 
 export default App;
