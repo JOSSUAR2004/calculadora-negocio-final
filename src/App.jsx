@@ -90,18 +90,49 @@ const App = () => {
 
         {/* HEADER RESPONSIVE */}
         <header className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100">
-          <h1 className="text-xl md:text-2xl font-black italic uppercase text-slate-800">Gol93<span className="text-emerald-500">Store</span></h1>
+          {/* Logo GOL93STORE */}
+          <h1 className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-white">
+            Gol93<span className="text-emerald-500">Store</span>
+          </h1>
 
-          <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
-            <button onClick={() => setModo('camisetas')} className={`...`}>👕 JERSEY</button>
-            <button onClick={() => setModo('zapatos')} className={`...`}>👟 GUAYOS</button>
-            <button onClick={() => setModo('stock')} className={`...`}>📦 STOCK</button>
-            <button onClick={() => setModo('deudas')} className={`...`}>💸 DEUDAS</button>
-          </div>
+          {/* Navegación Estilizada */}
+          <nav className="flex flex-wrap justify-center gap-2 bg-slate-800/50 p-2 rounded-2xl border border-slate-700/50 backdrop-blur-sm w-full md:w-auto">
+            {[
+              { id: 'camisetas', label: 'JERSEY', emoji: '👕' },
+              { id: 'zapatos', label: 'GUAYOS', emoji: '👟' },
+              { id: 'stock', label: 'STOCK', emoji: '📦' },
+              { id: 'deudas', label: 'DEUDAS', emoji: '💸' }
+            ].map((btn) => (
+              <button
+                key={btn.id}
+                onClick={() => setModo(btn.id)}
+                className={`
+          flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black tracking-wider transition-all duration-300
+          ${modo === btn.id
+                    ? 'bg-emerald-500 text-slate-900 shadow-[0_0_15px_rgba(16,185,129,0.4)] scale-105'
+                    : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'
+                  }
+        `}
+              >
+                <span className="text-sm md:text-base">{btn.emoji}</span>
+                {btn.label}
+              </button>
+            ))}
+          </nav>
 
-          <div className="bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto">
-            <span className="text-[9px] font-black text-emerald-600 uppercase mr-2 md:mr-0">TRM Actual</span>
-            <input type="number" value={tasaCOP} onChange={(e) => setTasaCOP(parseFloat(e.target.value) || 0)} className="bg-transparent border-none outline-none text-lg font-black text-emerald-800 w-20 md:w-24 text-right" />
+
+          {/* TRM Actual */}
+          <div className="bg-slate-800 px-5 py-3 rounded-2xl border border-slate-700 flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto min-w-[140px]">
+            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-0 md:mb-1">TRM Actual</span>
+            <div className="flex items-center">
+              <span className="text-emerald-500 font-black mr-1">$</span>
+              <input
+                type="number"
+                value={tasaCOP}
+                onChange={(e) => setTasaCOP(parseFloat(e.target.value) || 0)}
+                className="bg-transparent border-none outline-none text-xl font-black text-white w-20 md:w-24 text-right focus:text-emerald-400 transition-colors"
+              />
+            </div>
           </div>
         </header>
 
