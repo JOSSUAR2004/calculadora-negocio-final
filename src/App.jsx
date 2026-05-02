@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 const App = () => {
   // --- ESTADOS DE PERSISTENCIA ---
   const [tasaCOP, setTasaCOP] = useState(() => JSON.parse(localStorage.getItem('g93_tasa')) || 3600);
-  const [modo, setModo] = useState('camisetas'); 
+  const [modo, setModo] = useState('camisetas');
   const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('g93_items')) || []);
   const [historial, setHistorial] = useState(() => JSON.parse(localStorage.getItem('g93_historial')) || []);
   const [stock, setStock] = useState(() => JSON.parse(localStorage.getItem('g93_stock')) || []);
   const [deudas, setDeudas] = useState(() => JSON.parse(localStorage.getItem('g93_deudas')) || []);
-  
+
   // --- SINCRONIZACIÓN LOCALSTORAGE ---
   useEffect(() => {
     localStorage.setItem('g93_tasa', JSON.stringify(tasaCOP));
@@ -19,10 +19,10 @@ const App = () => {
   }, [tasaCOP, items, historial, stock, deudas]);
 
   // --- CONSTANTES LOGÍSTICAS ---
-  const COSTO_LIBRA = 3.10; 
+  const COSTO_LIBRA = 3.10;
   const ENVIO_CHINA_USA = 10;
   const CARGOS_FIJOS = 7;
-  const PESO_PAR_LB = 1.32; 
+  const PESO_PAR_LB = 1.32;
 
   const COSTOS_BASE_JERSEY = {
     fan: 13, player: 16, retro: 17, longSleeve: 17, children: 15, nba: 23, f1_nfl: 25
@@ -114,7 +114,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-10 font-sans text-slate-900">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* HEADER */}
         <header className="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6 bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-white">
           <div className="flex items-center gap-4">
@@ -134,7 +134,7 @@ const App = () => {
               { id: 'stock', label: 'Inventario', icon: '📦' },
               { id: 'deudas', label: 'Cuentas', icon: '💸' }
             ].map((tab) => (
-              <button 
+              <button
                 key={tab.id}
                 onClick={() => setModo(tab.id)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-[11px] uppercase transition-all duration-300 whitespace-nowrap ${modo === tab.id ? 'bg-white shadow-md text-slate-900 scale-105' : 'text-slate-400 hover:text-slate-600'}`}
@@ -147,10 +147,10 @@ const App = () => {
           <div className="flex items-center gap-3 bg-emerald-50 p-1.5 rounded-2xl border border-emerald-100">
             <div className="px-3">
               <p className="text-[8px] font-black text-emerald-600 uppercase">TRM Mercado</p>
-              <input 
-                type="number" 
-                value={tasaCOP} 
-                onChange={(e) => setTasaCOP(parseFloat(e.target.value) || 0)} 
+              <input
+                type="number"
+                value={tasaCOP}
+                onChange={(e) => setTasaCOP(parseFloat(e.target.value) || 0)}
                 className="bg-transparent border-none outline-none font-black text-emerald-800 text-lg w-24"
               />
             </div>
@@ -158,21 +158,21 @@ const App = () => {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* PANEL LATERAL */}
           <aside className="lg:col-span-4 space-y-6">
             {modo === 'zapatos' && (
               <section className="animate-in fade-in slide-in-from-left duration-500">
                 <div className="bg-slate-900 p-6 rounded-[2rem] text-white shadow-2xl mb-6 relative overflow-hidden">
-                  <InputDark label="Capacidad Caja (Pares)" type="number" value={cajaZapatos.cantidadTotalCaja} onChange={v => setCajaZapatos({cantidadTotalCaja: v})} />
+                  <InputDark label="Capacidad Caja (Pares)" type="number" value={cajaZapatos.cantidadTotalCaja} onChange={v => setCajaZapatos({ cantidadTotalCaja: v })} />
                 </div>
                 <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-5">
-                  <Input label="Referencia del Guayo" value={newZapato.nombre} onChange={v => setNewZapato({...newZapato, nombre: v})} />
+                  <Input label="Referencia del Guayo" value={newZapato.nombre} onChange={v => setNewZapato({ ...newZapato, nombre: v })} />
                   <div className="grid grid-cols-2 gap-4">
-                    <Input label="Costo China (USD)" type="number" value={newZapato.costoUSD} onChange={v => setNewZapato({...newZapato, costoUSD: v})} />
-                    <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({...newZapato, margen: v})} />
+                    <Input label="Costo China (USD)" type="number" value={newZapato.costoUSD} onChange={v => setNewZapato({ ...newZapato, costoUSD: v })} />
+                    <Input label="Margen %" type="number" value={newZapato.margen} onChange={v => setNewZapato({ ...newZapato, margen: v })} />
                   </div>
-                  <Input label="Cantidad" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({...newZapato, cantidad: v})} />
+                  <Input label="Cantidad" type="number" value={newZapato.cantidad} onChange={v => setNewZapato({ ...newZapato, cantidad: v })} />
                   <button onClick={agregarZapato} className="w-full bg-emerald-500 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-emerald-100">Registrar en Lote</button>
                 </div>
               </section>
@@ -180,24 +180,24 @@ const App = () => {
 
             {modo === 'camisetas' && (
               <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-5 border-b-[6px] border-indigo-500 animate-in fade-in slide-in-from-left duration-500">
-                <Input label="Equipo / Selección" value={newJersey.nombre} onChange={v => setNewJersey({...newJersey, nombre: v})} />
+                <Input label="Equipo / Selección" value={newJersey.nombre} onChange={v => setNewJersey({ ...newJersey, nombre: v })} />
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Calidad / Versión</label>
-                  <select 
+                  <select
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 font-bold text-slate-700 outline-none"
-                    value={newJersey.tipo} 
-                    onChange={e => setNewJersey({...newJersey, tipo: e.target.value})}
+                    value={newJersey.tipo}
+                    onChange={e => setNewJersey({ ...newJersey, tipo: e.target.value })}
                   >
                     {Object.keys(COSTOS_BASE_JERSEY).map(k => <option key={k} value={k}>{k.toUpperCase()}</option>)}
                   </select>
                 </div>
                 <div className="grid grid-cols-2 gap-4 items-end">
-                  <Input label="Parches" type="number" value={newJersey.parches} onChange={v => setNewJersey({...newJersey, parches: v})} />
-                  <button onClick={() => setNewJersey({...newJersey, dorsal: !newJersey.dorsal})} className={`p-4 rounded-2xl border-2 font-black text-[10px] h-[58px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-100 text-slate-400'}`}>
+                  <Input label="Parches" type="number" value={newJersey.parches} onChange={v => setNewJersey({ ...newJersey, parches: v })} />
+                  <button onClick={() => setNewJersey({ ...newJersey, dorsal: !newJersey.dorsal })} className={`p-4 rounded-2xl border-2 font-black text-[10px] h-[58px] transition-all ${newJersey.dorsal ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-100 text-slate-400'}`}>
                     {newJersey.dorsal ? 'CON DORSAL' : 'SIN DORSAL'}
                   </button>
                 </div>
-                <Input label="Unidades" type="number" value={newJersey.cantidad} onChange={v => setNewJersey({...newJersey, cantidad: v})} />
+                <Input label="Unidades" type="number" value={newJersey.cantidad} onChange={v => setNewJersey({ ...newJersey, cantidad: v })} />
                 <button onClick={agregarJersey} className="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-indigo-100">Agregar al Carrito</button>
               </section>
             )}
@@ -205,19 +205,19 @@ const App = () => {
             {modo === 'stock' && (
               <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-5 animate-in fade-in duration-500">
                 <h3 className="text-xs font-black uppercase text-orange-500 italic tracking-widest">Nuevo Ingreso a Bodega</h3>
-                <Input 
-                  label="Referencia / Equipo" 
+                <Input
+                  label="Referencia / Equipo"
                   placeholder="Ej: Real Madrid Local"
-                  value={newStock.referencia} 
-                  onChange={v => setNewStock({...newStock, referencia: v})} 
+                  value={newStock.referencia}
+                  onChange={v => setNewStock({ ...newStock, referencia: v })}
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase px-1 tracking-wider">Tipo</label>
-                    <select 
+                    <select
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none font-bold text-slate-700 text-sm focus:ring-2 ring-orange-500/20 focus:border-orange-500 transition-all"
                       value={newStock.tipo}
-                      onChange={e => setNewStock({...newStock, tipo: e.target.value})}
+                      onChange={e => setNewStock({ ...newStock, tipo: e.target.value })}
                     >
                       <option value="player">Player</option>
                       <option value="fan">Fan</option>
@@ -228,10 +228,10 @@ const App = () => {
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase px-1 tracking-wider">Talla</label>
-                    <select 
+                    <select
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none font-bold text-slate-700 text-sm focus:ring-2 ring-orange-500/20 focus:border-orange-500 transition-all"
                       value={newStock.talla}
-                      onChange={e => setNewStock({...newStock, talla: e.target.value})}
+                      onChange={e => setNewStock({ ...newStock, talla: e.target.value })}
                     >
                       <optgroup label="Ropa">
                         {['S', 'M', 'L', 'XL', 'XXL'].map(t => <option key={t} value={t}>{t}</option>)}
@@ -242,12 +242,12 @@ const App = () => {
                     </select>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => {
-                    if(!newStock.referencia) return;
-                    setStock([{id: Date.now(), ...newStock}, ...stock]);
-                    setNewStock({referencia: '', talla: 'L', tipo: 'player'});
-                  }} 
+                    if (!newStock.referencia) return;
+                    setStock([{ id: Date.now(), ...newStock }, ...stock]);
+                    setNewStock({ referencia: '', talla: 'L', tipo: 'player' });
+                  }}
                   className="w-full bg-orange-500 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-orange-100 transition-all active:scale-95"
                 >
                   Confirmar Entrada
@@ -260,15 +260,24 @@ const App = () => {
                 <h3 className="text-xs font-black uppercase text-red-500 italic">Registrar Saldo</h3>
                 <Input label="Cliente" id="d-nom" />
                 <Input label="Valor COP" type="number" id="d-val" />
-                <button 
+                <button
                   onClick={() => {
                     const n = document.getElementById('d-nom').value;
                     const v = document.getElementById('d-val').value;
-                    if(n && v) {
-                      setDeudas([{id: Date.now(), cliente: n, monto: parseFloat(v), fecha: new Date().toLocaleDateString()}, ...deudas]);
-                      document.getElementById('d-nom').value = ''; document.getElementById('d-val').value = '';
+
+                    if (n && v) {
+                      // El secreto está en Number(v) para evitar la concatenación loca
+                      setDeudas([{
+                        id: Date.now(),
+                        cliente: n,
+                        monto: Number(v), // Convertimos explícitamente a número
+                        fecha: new Date().toLocaleDateString()
+                      }, ...deudas]);
+
+                      document.getElementById('d-nom').value = '';
+                      document.getElementById('d-val').value = '';
                     }
-                  }} 
+                  }}
                   className="w-full bg-red-500 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-red-100"
                 >
                   Crear Cuenta
@@ -347,7 +356,7 @@ const App = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-xs font-black text-emerald-600 leading-none">{fmt(lote.ganancia)}</p>
-                        <button onClick={(e) => {e.stopPropagation(); setHistorial(historial.filter(h => h.id !== lote.id))}} className="text-slate-200 hover:text-red-500 text-[10px] mt-2 font-black">✕</button>
+                        <button onClick={(e) => { e.stopPropagation(); setHistorial(historial.filter(h => h.id !== lote.id)) }} className="text-slate-200 hover:text-red-500 text-[10px] mt-2 font-black">✕</button>
                       </div>
                     </div>
                   ))}
@@ -383,7 +392,7 @@ const App = () => {
                             <span className="text-[10px] font-black text-orange-600">Talla {item.talla}</span>
                           </td>
                           <td className="p-6 text-right">
-                            <button 
+                            <button
                               onClick={() => setStock(stock.filter(i => i.id !== item.id))}
                               className="bg-slate-900 text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase hover:bg-emerald-500 transition-colors"
                             >
@@ -431,7 +440,7 @@ const App = () => {
                             <td className="p-6 font-black text-slate-800 text-sm uppercase">{deuda.cliente}</td>
                             <td className="p-6 text-center font-black text-red-600 text-md">{fmt(deuda.monto)}</td>
                             <td className="p-6 text-right">
-                              <button 
+                              <button
                                 onClick={() => setDeudas(deudas.filter(d => d.id !== deuda.id))}
                                 className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase transition-all"
                               >
