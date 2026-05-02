@@ -241,56 +241,54 @@ const App = () => {
             )}
 
             {modo === 'stock' && (
-              <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-5 animate-in fade-in duration-500">
-                <h3 className="text-xs font-black uppercase text-orange-500 italic tracking-widest">Nuevo Ingreso a stock</h3>
-                <Input
-                  label="Referencia / Equipo"
-                  placeholder="Ej: Real Madrid Local"
-                  value={newStock.referencia}
-                  onChange={v => setNewStock({ ...newStock, referencia: v })}
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase px-1 tracking-wider">Tipo</label>
-                    <select
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none font-bold text-slate-700 text-sm focus:ring-2 ring-orange-500/20 focus:border-orange-500 transition-all"
-                      value={newStock.tipo}
-                      onChange={e => setNewStock({ ...newStock, tipo: e.target.value })}
-                    >
-                      <option value="player">Player</option>
-                      <option value="fan">Fan</option>
-                      <option value="retro">Retro</option>
-                      <option value="children">Niño</option>
-                      <option value="nba">NBA</option>
-                    </select>
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase px-1 tracking-wider">Talla</label>
-                    <select
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none font-bold text-slate-700 text-sm focus:ring-2 ring-orange-500/20 focus:border-orange-500 transition-all"
-                      value={newStock.talla}
-                      onChange={e => setNewStock({ ...newStock, talla: e.target.value })}
-                    >
-                      <optgroup label="Ropa">
-                        {['S', 'M', 'L', 'XL', 'XXL'].map(t => <option key={t} value={t}>{t}</option>)}
-                      </optgroup>
-                      <optgroup label="Calzado">
-                        {['38', '39', '40', '41', '42', '43'].map(t => <option key={t} value={t}>{t}</option>)}
-                      </optgroup>
-                    </select>
-                  </div>
+              <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in duration-300">
+                <div className="p-6 border-b flex justify-between bg-slate-50/50 items-center">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Bodega Gol93</span>
+                  <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-3 py-1 rounded-full">{stock.length} Artículos</span>
                 </div>
-                <button
-                  onClick={() => {
-                    if (!newStock.referencia) return;
-                    setStock([{ id: Date.now(), ...newStock }, ...stock]);
-                    setNewStock({ referencia: '', talla: 'L', tipo: 'player' });
-                  }}
-                  className="w-full bg-orange-500 text-white p-5 rounded-2xl font-black text-xs uppercase shadow-lg shadow-orange-100 transition-all active:scale-95"
-                >
-                  Confirmar Entrada
-                </button>
-              </section>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="text-[10px] font-black text-slate-400 uppercase">
+                        <th className="p-6">Referencia</th>
+                        <th className="p-6 text-center">Talla</th>
+                        <th className="p-6 text-right">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {stock.map(item => (
+                        <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                          {editandoId === item.id ? (
+                            <>
+                              <td className="p-4"><input className="border rounded-lg p-2 w-full font-bold uppercase text-sm" value={tempEdit.referencia} onChange={e => setTempEdit({ ...tempEdit, referencia: e.target.value })} /></td>
+                              <td className="p-4"><input className="border rounded-lg p-2 w-20 font-bold text-center" value={tempEdit.talla} onChange={e => setTempEdit({ ...tempEdit, talla: e.target.value })} /></td>
+                              <td className="p-4 text-right">
+                                <button onClick={guardarEdicion} className="bg-emerald-500 text-white px-4 py-2 rounded-lg font-black text-[10px] uppercase mr-2 shadow-md">OK</button>
+                                <button onClick={() => setEditandoId(null)} className="text-slate-300 font-black text-[10px] uppercase hover:text-slate-500">X</button>
+                              </td>
+                            </>
+                          ) : (
+                            <>
+                              <td className="p-6">
+                                <div className="font-bold text-slate-800 text-sm uppercase">{item.referencia}</div>
+                                <div className="text-[9px] text-slate-400 font-black uppercase italic">{item.tipo}</div>
+                              </td>
+                              <td className="p-6 text-center">
+                                <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-md uppercase">Talla {item.talla}</span>
+                              </td>
+                              <td className="p-6 text-right space-x-3">
+                                <button onClick={() => iniciarEdicion(item)} className="text-slate-300 hover:text-indigo-500 transition-colors">✏️</button>
+                                <button onClick={() => registrarVenta(item)} className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase hover:bg-emerald-500 transition-all shadow-sm">Vendido</button>
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
             )}
 
             {modo === 'ventas' && (
