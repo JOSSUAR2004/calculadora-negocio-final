@@ -484,7 +484,7 @@ const App = () => {
               <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in duration-300">
                 <div className="p-6 border-b border-slate-50 flex justify-between bg-slate-50/50 items-center">
                   <span className="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Inventario en Bodega</span>
-                  <span className="bg-orange-50 text-white-600 text-[10px] font-black px-3 py-1 rounded-full">{stock.length} Artículos</span>
+                  <span className="bg-orange-50 text-orange-600 text-[10px] font-black px-3 py-1 rounded-full">{stock.length} Artículos</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
@@ -500,15 +500,17 @@ const App = () => {
                       {stock.map(item => (
                         <tr key={item.id} className="hover:bg-slate-50">
                           {editandoId === item.id ? (
-                            // --- VISTA DE EDICIÓN ---
                             <>
                               <td className="p-4">
-                                <input className="border rounded-lg p-2 w-full font-bold"
+                                <input className="border rounded-lg p-2 w-full font-bold uppercase text-sm"
                                   value={tempEdit.referencia}
                                   onChange={e => setTempEdit({ ...tempEdit, referencia: e.target.value })} />
                               </td>
+                              <td className="p-4 text-center text-[9px] font-black text-slate-400 uppercase italic">
+                                {item.tipo}
+                              </td>
                               <td className="p-4 text-center">
-                                <input className="border rounded-lg p-2 w-20 font-bold"
+                                <input className="border rounded-lg p-2 w-20 font-bold text-center"
                                   value={tempEdit.talla}
                                   onChange={e => setTempEdit({ ...tempEdit, talla: e.target.value })} />
                               </td>
@@ -518,14 +520,23 @@ const App = () => {
                               </td>
                             </>
                           ) : (
-                            // --- VISTA NORMAL ---
                             <>
+                              {/* 1. REFERENCIA */}
                               <td className="p-6 font-bold text-slate-800 uppercase">{item.referencia}</td>
-                              <td className="p-6 font-bold text-slate-800 uppercase">Talla {item.talla}</td>
+
+                              {/* 2. TIPO (Esta es la columna que faltaba para que no se ruede) */}
+                              <td className="p-6 text-center text-[9px] font-black text-slate-400 uppercase italic">
+                                {item.tipo}
+                              </td>
+
+                              {/* 3. TALLA */}
+                              <td className="p-6 text-center font-bold text-slate-800 uppercase">Talla {item.talla}</td>
+
+                              {/* 4. ACCIÓN */}
                               <td className="p-6 text-right space-x-4">
-                                <button onClick={() => iniciarEdicion(item)} className="text-slate-400 hover:text-indigo-600 transition-colors"> Editar</button>
+                                <button onClick={() => iniciarEdicion(item)} className="text-slate-400 hover:text-indigo-600 transition-colors">Editar</button>
                                 <button onClick={() => registrarVenta(item)} className="bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-[9px] uppercase hover:bg-emerald-500 transition-colors">Vendido</button>
-                              </td >
+                              </td>
                             </>
                           )}
                         </tr>
